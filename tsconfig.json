@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    /* Basic Options */
+    "target": "es5",
+    "module": "commonjs",
+    "allowJs": false,
+    "checkJs": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./build",
+    "rootDir": "./src",
+    "composite": false,
+    "incremental": true,
+    "tsBuildInfoFile": "./tsBuildInfo.json",
+    "removeComments": false,
+    "noEmit": false,
+    "importHelpers": false,
+    "downlevelIteration": false,
+    "isolatedModules": false,
+    "newLine": "LF",
+
+    /* Strict Type-Checking Options */
+    "strict": true,
+
+    /* Additional Checks */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Module Resolution Options */
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "preserveSymlinks": true,
+    "moduleResolution": "node"
+  },
+  "include": ["src/**/*"]
+}

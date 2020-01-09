@@ -1,0 +1,34 @@
+{
+  "name": "@qdivision/chip",
+  "version": "1.0.0",
+  "contributors": [
+    "Andrew Dillon <andrew.dillon.j@gmail.com>",
+    "Jason Hatton",
+    "David Morley",
+    "Joel Walker",
+    "Erik Hefferly",
+    "Ravi Ramphe"
+  ],
+  "license": "MIT",
+  "private": false,
+  "bin": {
+    "chip": "chip.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "buildw": "tsc --watch"
+  },
+  "dependencies": {
+    "chalk": "^3.0.0",
+    "js-yaml": "^3.13.1",
+    "mz": "^2.7.0",
+    "yargs": "^15.1.0"
+  },
+  "devDependencies": {
+    "@types/yargs": "^13.0.4",
+    "@types/node": "^13.1.4",
+    "@types/js-yaml": "^3.12.1",
+    "prettier": "^1.19.1",
+    "typescript": "^3.7.4"
+  }
+}
