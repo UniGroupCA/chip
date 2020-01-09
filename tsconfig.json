@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     /* Basic Options */
-    "target": "es5",
+    "target": "es2018",
     "module": "commonjs",
+    "lib": ["es2018"],
     "allowJs": false,
     "checkJs": false,
     "declaration": true,
@@ -30,7 +31,6 @@
     "noFallthroughCasesInSwitch": true,
 
     /* Module Resolution Options */
-    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "preserveSymlinks": true,
     "moduleResolution": "node"

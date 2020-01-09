@@ -2,3 +2,4 @@ build
 node_modules
 
 tsBuildInfo.json
+yarn-error.log
