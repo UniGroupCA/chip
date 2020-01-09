@@ -1,5 +1,6 @@
 import yargs from 'yargs';
 import { syncServices } from './subcommands/sync';
+import { installServices } from './subcommands/install';
 
 yargs
   .command(
@@ -14,7 +15,9 @@ yargs
     'install',
     'Install dependencies for all services in project',
     {},
-    () => {},
+    () => {
+      installServices();
+    },
   )
   .command('start', 'Start all services in project', {}, () => {
     console.log('TODO: Implement me');

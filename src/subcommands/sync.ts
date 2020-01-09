@@ -20,6 +20,11 @@ export const syncServices = async () => {
   const services = await readServices();
 
   for (const { name, repo } of services) {
-    await syncService(name, repo);
+    if (!repo) continue;
+    try {
+      await syncService(name, repo);
+    } catch (e) {
+      console.error(e);
+    }
   }
 };

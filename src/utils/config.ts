@@ -3,7 +3,7 @@ import yaml from 'js-yaml';
 
 export interface ChipConfig {
   services: {
-    [name: string]: { repo: string; install?: string; run?: string };
+    [name: string]: { repo?: string; install?: string; run?: string };
   };
 }
 
