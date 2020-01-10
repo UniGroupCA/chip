@@ -7,7 +7,7 @@ export interface ExecOptions {
 
 export const exec = (
   command: string,
-  { cwd, live }: ExecOptions,
+  { cwd, live }: ExecOptions = {},
 ): Promise<string> => {
   const child = spawn('bash', ['-c', command], { cwd });
 

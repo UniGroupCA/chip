@@ -1,7 +1,9 @@
 import { readServices } from '../utils/config';
 import { exec } from '../utils/processes';
+import { log } from '../utils/log';
 
 export const installService = async (name: string, install: string) => {
+  log`Installing dependencies for {bold ${name}}`;
   await exec(install, { cwd: name, live: true });
 };
 

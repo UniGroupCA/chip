@@ -1,9 +1,16 @@
 import fs from 'mz/fs';
 import yaml from 'js-yaml';
+import { readJsonFile, CHIP_PROCESSES_FILE } from './files';
 
 export interface ChipConfig {
-  services: {
-    [name: string]: { repo?: string; install?: string; run?: string };
+  services?: {
+    [name: string]:
+      | {
+          repo?: string;
+          install?: string;
+          run?: string;
+        }
+      | undefined;
   };
 }
 
@@ -13,10 +20,26 @@ export const readConfig = async (): Promise<ChipConfig> => {
   return chipConfig;
 };
 
-export const readServices = async () => {
-  const { services } = await readConfig();
+export const readServices = async (): Promise<{
+  name: string;
+  repo?: string;
+  install?: string;
+  run?: string;
+}[]> => {
+  const { services = {} } = await readConfig();
   return Object.entries(services).map(([name, values]) => ({
     name,
     ...values,
   }));
 };
+
+export interface Processes {
+  [projectName: string]:
+    | {
+        [serviceName: string]: { pid: number } | undefined;
+      }
+    | undefined;
+}
+
+export const readProcesses = async (): Promise<Processes> =>
+  readJsonFile(CHIP_PROCESSES_FILE);
