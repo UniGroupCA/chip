@@ -12,7 +12,8 @@
   "license": "MIT",
   "private": false,
   "bin": {
-    "chip": "chip.js"
+    "chip": "chip.js",
+    "chip-log-stamper": "chip-log-stamper.js"
   },
   "scripts": {
     "build": "tsc",
@@ -24,6 +25,7 @@
     "js-yaml": "^3.13.1",
     "mz": "^2.7.0",
     "table": "^5.4.6",
+    "tail": "^2.0.3",
     "yargs": "^15.1.0"
   },
   "devDependencies": {

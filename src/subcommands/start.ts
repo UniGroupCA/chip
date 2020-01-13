@@ -1,6 +1,6 @@
 import fs from 'mz/fs';
 import { readServices } from '../utils/config';
-import { PROJECT_NAME } from '../utils/files';
+import { PROJECT_NAME, CHIP_LOGS_DIR } from '../utils/files';
 import { log } from '../utils/log';
 import { persistPid, getActiveProcesses, createLogStream } from '../utils/ps';
 import { exec, execDetached } from '../utils/processes';
@@ -11,8 +11,13 @@ import { exec, execDetached } from '../utils/processes';
 export const startService = async (serviceName: string, run: string) => {
   log`Starting service {bold ${serviceName}}`;
 
+  const stampFile = `${CHIP_LOGS_DIR}/${PROJECT_NAME}/${serviceName}.log.timestamps`;
+
   const out = await createLogStream(PROJECT_NAME, serviceName);
-  const subprocess = execDetached(run, { cwd: serviceName, out });
+  const subprocess = execDetached(`${run} | chip-log-stamper ${stampFile}`, {
+    cwd: serviceName,
+    out,
+  });
 
   await persistPid(PROJECT_NAME, serviceName, subprocess.pid);
 };
