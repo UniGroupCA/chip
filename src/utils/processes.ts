@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { spawn, ChildProcess } from 'child_process';
 
 export interface ExecOptions {
   cwd?: string;
@@ -31,4 +31,24 @@ export const exec = (
       else resolve(output);
     });
   });
+};
+
+export interface SpawnOptions {
+  cwd?: string;
+  out?: number;
+}
+
+export const execDetached = (
+  command: string,
+  { cwd, out }: SpawnOptions = {},
+): ChildProcess => {
+  const subprocess = spawn('bash', ['-c', command], {
+    cwd,
+    stdio: out ? ['ignore', out, out] : 'inherit',
+    detached: true,
+  });
+
+  subprocess.unref();
+
+  return subprocess;
 };

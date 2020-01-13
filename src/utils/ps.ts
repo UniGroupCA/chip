@@ -1,10 +1,16 @@
 import fs from 'mz/fs';
 import { exec } from './processes';
-import { CHIP_DIR, CHIP_PROCESSES_FILE, writeJsonFile } from './files';
+import {
+  CHIP_DIR,
+  CHIP_PROCESSES_FILE,
+  writeJsonFile,
+  CHIP_LOGS_DIR,
+} from './files';
 import { readProcesses } from './config';
 
 export const initChip = async () => {
   if (!(await fs.exists(CHIP_DIR))) await fs.mkdir(CHIP_DIR);
+  if (!(await fs.exists(CHIP_LOGS_DIR))) await fs.mkdir(CHIP_LOGS_DIR);
 
   if (!(await fs.exists(CHIP_PROCESSES_FILE))) {
     writeJsonFile(CHIP_PROCESSES_FILE, {});
@@ -44,4 +50,13 @@ export const getActiveProcesses = async (projectName: string) => {
     if (await processExists(config!.pid)) activeProcesses[name] = config!;
   }
   return activeProcesses;
+};
+
+export const createLogStream = async (
+  projectName: string,
+  serviceName: string,
+) => {
+  const dir = `${CHIP_LOGS_DIR}/${projectName}`;
+  if (!(await fs.exists(dir))) await fs.mkdir(dir);
+  return fs.open(`${dir}/${serviceName}.log`, 'w');
 };
