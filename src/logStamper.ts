@@ -17,8 +17,8 @@ const [, , stampFilePath] = process.argv;
   });
 
   rl.on('line', (line) => {
-    const timestamp = Date.now();
+    const timestamp = process.hrtime();
     console.log(line);
-    stampFile.write(`${timestamp}\n`);
+    stampFile.write(`${timestamp} ${line}\n`);
   });
 })();

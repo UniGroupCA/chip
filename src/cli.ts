@@ -1,4 +1,5 @@
 import yargs from 'yargs';
+
 import { syncServices } from './subcommands/sync';
 import { installServices } from './subcommands/install';
 import { initChip } from './utils/ps';
@@ -42,4 +43,6 @@ yargs
     await initChip();
     await listServices();
   })
-  .help().argv;
+  .help()
+  .strict()
+  .demandCommand().argv;
