@@ -23,11 +23,13 @@
     "chalk": "^3.0.0",
     "js-yaml": "^3.13.1",
     "mz": "^2.7.0",
+    "table": "^5.4.6",
     "yargs": "^15.1.0"
   },
   "devDependencies": {
     "@types/js-yaml": "^3.12.1",
     "@types/node": "^13.1.4",
+    "@types/table": "^4.0.7",
     "@types/yargs": "^13.0.4",
     "prettier": "^1.19.1",
     "typescript": "^3.7.4"

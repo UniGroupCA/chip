@@ -4,6 +4,7 @@ import { installServices } from './subcommands/install';
 import { initChip } from './utils/ps';
 import { startServices } from './subcommands/start';
 import { stopServices } from './subcommands/stop';
+import { listServices } from './subcommands/list';
 
 yargs
   .command(
@@ -32,10 +33,11 @@ yargs
     await initChip();
     await stopServices();
   })
-  .command('logs', 'View logs for all services in project', {}, () => {
+  .command('logs', 'View logs for all services in project', {}, async () => {
     console.log('TODO: Implement me');
   })
-  .command('list', 'List all services in project', {}, () => {
-    console.log('TODO: Implement me');
+  .command('list', 'List all services in project', {}, async () => {
+    await initChip();
+    await listServices();
   })
   .help().argv;
