@@ -1,9 +1,10 @@
 import chalk from 'chalk';
 import { Tail } from 'tail';
+import { maxBy } from 'lodash';
 
-import { getAllProcesses } from '../utils/ps';
 import { CHIP_LOGS_DIR, PROJECT_NAME } from '../utils/files';
 import { fs } from 'mz';
+import { readServices } from '../utils/config';
 
 const getProcessTail = async (projectName: string, serviceName: string) => {
   const fileName = `${CHIP_LOGS_DIR}/${projectName}/${serviceName}.log`;
@@ -11,11 +12,18 @@ const getProcessTail = async (projectName: string, serviceName: string) => {
   return new Tail(fileName);
 };
 
-export const logService = async (projectName: string, serviceName: string) => {
+export const logService = async (
+  projectName: string,
+  serviceName: string,
+  padLength: number,
+  color: chalk.Chalk,
+) => {
   const tail = await getProcessTail(projectName, serviceName);
 
   tail.on('line', (data: any) => {
-    const servicePrefix = chalk`{bold ${serviceName} | }`;
+    const servicePrefix = color(
+      chalk`{bold [L] ${serviceName.padEnd(padLength)} | }`,
+    );
     console.log(servicePrefix + data);
   });
 
@@ -24,14 +32,6 @@ export const logService = async (projectName: string, serviceName: string) => {
       chalk`{red Error tailing logs for {bold ${serviceName}}: ${error}}`,
     );
   });
-};
-
-export const logServicesX = async () => {
-  const processes = (await getAllProcesses(PROJECT_NAME)) || {};
-
-  for (const [name] of Object.entries(processes)) {
-    logService(PROJECT_NAME, name);
-  }
 };
 
 const prefixColors = [
@@ -49,38 +49,77 @@ const prefixColors = [
   chalk.cyanBright,
 ];
 
-export const logServices = async () => {
-  const processes = (await getAllProcesses(PROJECT_NAME)) || {};
+/*
+Flow for `chip logs`:
+  1. Read in all timestamped log files.
+  2. Count the lines in each file from (1).
+  3. Start tailing each timestamped log file (from the beginning).
+  4. When tailed file emits a line, queue it up in a common array.
+    - Skip the line if it is less than the count from (2).
+    - Maybe not necessary if this isn't done asynchronous.
+  5. Sort and print logs from the timestamped files.
+  6. Begin emitting lines from queue in (4) - live.
+*/
 
-  const longestServiceName = (Object.keys(processes).sort(
-    (a, b) => b.length - a.length,
-  ) || [''])[0];
+interface Log {
+  timestamp: number;
+  log: string;
+  serviceName: string;
+}
+
+const printLog = (
+  { serviceName, log }: Log,
+  padLength: number,
+  color: chalk.Chalk,
+) => {
+  const servicePrefix = color(
+    chalk`{bold [H] ${serviceName.padEnd(padLength)} | }`,
+  );
+  console.log(servicePrefix + log);
+};
+
+export const logServices = async () => {
+  const services = await readServices();
+  const serviceNames = services.map(({ name }) => name);
+  const longestServiceName = (maxBy(serviceNames, 'length') || '').length;
 
   const colorForService: { [name: string]: chalk.Chalk } = {};
-  Object.keys(processes).forEach((name, idx) => {
+  serviceNames.forEach((name, idx) => {
     colorForService[name] = prefixColors[idx % prefixColors.length];
   });
 
-  const allLines = [];
-  for (const [name] of Object.entries(processes)) {
-    const fileName = `${CHIP_LOGS_DIR}/${PROJECT_NAME}/${name}.log.timestamps`;
-    const contents = await fs.readFile(fileName, 'utf8');
-    const lines = contents.split('\n').map((line) => {
-      const firstSpace = line.indexOf(' ');
-      const timestamp = Number(line.substring(0, firstSpace));
-      const log = line.substring(firstSpace + 1);
-      return { timestamp, log, serviceName: name };
-    });
-    allLines.push(...lines);
+  const logs: Log[] = [];
+  const initialLinesForService: { [name: string]: number } = {};
+
+  for (const serviceName of serviceNames) {
+    const fileName = `${CHIP_LOGS_DIR}/${PROJECT_NAME}/${serviceName}.log.timestamps`;
+    if (await fs.exists(fileName)) {
+      const contents = await fs.readFile(fileName, 'utf8');
+      const lines = contents.split('\n').map((line) => {
+        const firstSpace = line.indexOf(' ');
+        const timestamp = Number(line.substring(0, firstSpace));
+        const log = line.substring(firstSpace + 1);
+        return { timestamp, log, serviceName };
+      });
+      initialLinesForService[serviceName] = lines.length;
+      logs.push(...lines);
+    }
   }
 
-  allLines.sort((a, b) => a.timestamp - b.timestamp);
-  for (const { serviceName, log } of allLines) {
-    const color = colorForService[serviceName];
-    const padLength = longestServiceName.length;
-    const servicePrefix = color(
-      chalk`{bold ${serviceName.padEnd(padLength)} | }`,
-    );
-    console.log(servicePrefix + log);
+  logs.sort((a, b) => a.timestamp - b.timestamp);
+  for (const log of logs) {
+    printLog(log, longestServiceName, colorForService[log.serviceName]);
+  }
+
+  for (const serviceName of serviceNames) {
+    const fileName = `${CHIP_LOGS_DIR}/${PROJECT_NAME}/${serviceName}.log.timestamps`;
+    if (await fs.exists(fileName)) {
+      logService(
+        PROJECT_NAME,
+        serviceName,
+        longestServiceName,
+        colorForService[serviceName],
+      );
+    }
   }
 };
