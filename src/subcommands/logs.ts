@@ -1,16 +1,39 @@
 import chalk from 'chalk';
-import { Tail } from 'tail';
+// import { Tail } from 'tail';
 import { maxBy } from 'lodash';
 
 import { CHIP_LOGS_DIR, PROJECT_NAME } from '../utils/files';
 import { fs } from 'mz';
 import { readServices } from '../utils/config';
+import { spawn } from 'child_process';
 
-const getProcessTail = async (projectName: string, serviceName: string) => {
-  const fileName = `${CHIP_LOGS_DIR}/${projectName}/${serviceName}.log`;
-  // const fileName = `${CHIP_LOGS_DIR}/${PROJECT_NAME}/${serviceName}.log.timestamps`;
-  return new Tail(fileName);
-};
+// const getProcessTail = async (projectName: string, serviceName: string) => {
+//   const fileName = `${CHIP_LOGS_DIR}/${projectName}/${serviceName}.log`;
+//   // const fileName = `${CHIP_LOGS_DIR}/${PROJECT_NAME}/${serviceName}.log.timestamps`;
+//   return new Tail(fileName, { logger: console });
+// };
+
+// export const logService = async (
+//   projectName: string,
+//   serviceName: string,
+//   padLength: number,
+//   color: chalk.Chalk,
+// ) => {
+//   const tail = await getProcessTail(projectName, serviceName);
+
+//   tail.on('line', (data: any) => {
+//     const servicePrefix = color(
+//       chalk`{bold [L] ${serviceName.padEnd(padLength)} | }`,
+//     );
+//     console.log(servicePrefix + data);
+//   });
+
+//   tail.on('error', (error: any) => {
+//     console.error(
+//       chalk`{red Error tailing logs for {bold ${serviceName}}: ${error}}`,
+//     );
+//   });
+// };
 
 export const logService = async (
   projectName: string,
@@ -18,19 +41,36 @@ export const logService = async (
   padLength: number,
   color: chalk.Chalk,
 ) => {
-  const tail = await getProcessTail(projectName, serviceName);
-
-  tail.on('line', (data: any) => {
-    const servicePrefix = color(
-      chalk`{bold [L] ${serviceName.padEnd(padLength)} | }`,
-    );
-    console.log(servicePrefix + data);
-  });
-
-  tail.on('error', (error: any) => {
-    console.error(
-      chalk`{red Error tailing logs for {bold ${serviceName}}: ${error}}`,
-    );
+  const fileName = `${CHIP_LOGS_DIR}/${projectName}/${serviceName}.log`;
+  const subprocess = spawn('tail', ['-f', fileName]);
+  [subprocess.stdout, subprocess.stderr].forEach((stream) => {
+    let prevData = '';
+    stream.on('data', (data: string) => {
+      const allData = prevData + data;
+      const lines = allData.split('\n');
+      if (lines.length > 1 && lines[lines.length - 1] !== '') {
+        prevData = lines[lines.length - 1];
+      }
+      lines
+        .slice(
+          0,
+          lines.length > 1 && lines[lines.length - 1] !== ''
+            ? lines.length - 2
+            : lines.length - 1,
+        )
+        .forEach((line) => {
+          const servicePrefix = color(
+            chalk`{bold [L] ${serviceName.padEnd(padLength)} | }`,
+          );
+          console.log(servicePrefix + line);
+        });
+    });
+    stream.on('exit', (data: string) => {
+      console.log('Exited:', data);
+    });
+    stream.on('error', (data: string) => {
+      console.error('Error:', data);
+    });
   });
 };
 
@@ -78,6 +118,7 @@ const printLog = (
   console.log(servicePrefix + log);
 };
 
+// TODO: Implement line skipping!
 export const logServices = async () => {
   const services = await readServices();
   const serviceNames = services.map(({ name }) => name);

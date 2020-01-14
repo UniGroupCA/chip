@@ -63,6 +63,6 @@ const [, , stampFilePath] = process.argv;
     const timestamp = process.hrtime.bigint().toString();
     console.log(line);
     stampFile.write(`${timestamp} ${line}\n`);
-    setTimeout(() => fs.fdatasyncSync(stampFd), 100);
+    // setTimeout(() => fs.fdatasyncSync(stampFd), 1000);
   });
 })();
