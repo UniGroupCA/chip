@@ -69,6 +69,9 @@ interface Log {
   serviceName: string;
 }
 
+// TODO: Should we periodically check for new services whose logs need to be
+//       printed, incase services are started/stopped while `chip logs` is
+//       running?
 const printLog = (
   { serviceName, log }: Log,
   padLength: number,

@@ -3,6 +3,7 @@ import yaml from 'js-yaml';
 import { readJsonFile, CHIP_PROCESSES_FILE } from './files';
 
 export interface ChipConfig {
+  setup?: string;
   services?: {
     [name: string]:
       | {
@@ -18,6 +19,11 @@ export const readConfig = async (): Promise<ChipConfig> => {
   const chipYml = await fs.readFile('./chip.yml', 'utf8');
   const chipConfig = await yaml.safeLoad(chipYml);
   return chipConfig;
+};
+
+export const readSetup = async (): Promise<string> => {
+  const { setup } = await readConfig();
+  return setup || '';
 };
 
 export const readServices = async (): Promise<{
