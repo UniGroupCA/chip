@@ -1,75 +1,37 @@
 import chalk from 'chalk';
-// import { Tail } from 'tail';
 import { maxBy } from 'lodash';
+import readline from 'readline';
+import { fs } from 'mz';
 
 import { CHIP_LOGS_DIR, PROJECT_NAME } from '../utils/files';
-import { fs } from 'mz';
 import { readServices } from '../utils/config';
 import { spawn } from 'child_process';
-
-// const getProcessTail = async (projectName: string, serviceName: string) => {
-//   const fileName = `${CHIP_LOGS_DIR}/${projectName}/${serviceName}.log`;
-//   // const fileName = `${CHIP_LOGS_DIR}/${PROJECT_NAME}/${serviceName}.log.timestamps`;
-//   return new Tail(fileName, { logger: console });
-// };
-
-// export const logService = async (
-//   projectName: string,
-//   serviceName: string,
-//   padLength: number,
-//   color: chalk.Chalk,
-// ) => {
-//   const tail = await getProcessTail(projectName, serviceName);
-
-//   tail.on('line', (data: any) => {
-//     const servicePrefix = color(
-//       chalk`{bold [L] ${serviceName.padEnd(padLength)} | }`,
-//     );
-//     console.log(servicePrefix + data);
-//   });
-
-//   tail.on('error', (error: any) => {
-//     console.error(
-//       chalk`{red Error tailing logs for {bold ${serviceName}}: ${error}}`,
-//     );
-//   });
-// };
+import { log } from '../utils/log';
 
 export const logService = async (
   projectName: string,
   serviceName: string,
   padLength: number,
   color: chalk.Chalk,
+  offset: number,
 ) => {
   const fileName = `${CHIP_LOGS_DIR}/${projectName}/${serviceName}.log`;
-  const subprocess = spawn('tail', ['-f', fileName]);
+  const subprocess = spawn('tail', ['-f', '-c', `+${offset}`, fileName]);
   [subprocess.stdout, subprocess.stderr].forEach((stream) => {
-    let prevData = '';
-    stream.on('data', (data: string) => {
-      const allData = prevData + data;
-      const lines = allData.split('\n');
-      if (lines.length > 1 && lines[lines.length - 1] !== '') {
-        prevData = lines[lines.length - 1];
-      }
-      lines
-        .slice(
-          0,
-          lines.length > 1 && lines[lines.length - 1] !== ''
-            ? lines.length - 2
-            : lines.length - 1,
-        )
-        .forEach((line) => {
-          const servicePrefix = color(
-            chalk`{bold [L] ${serviceName.padEnd(padLength)} | }`,
-          );
-          console.log(servicePrefix + line);
-        });
+    const rl = readline.createInterface({ input: stream });
+
+    rl.on('line', (line) => {
+      const paddedName = serviceName.padEnd(padLength);
+      const prefix = color(chalk.bold(`[L] ${paddedName} | `));
+      console.log(prefix + line);
     });
-    stream.on('exit', (data: string) => {
-      console.log('Exited:', data);
+
+    stream.on('exit', (data) => {
+      log`{blue ${serviceName} output stream exited: ${data}}`;
     });
-    stream.on('error', (data: string) => {
-      console.error('Error:', data);
+
+    stream.on('error', ({ message }) => {
+      log`{red ${serviceName} output stream exited with error: ${message}}`;
     });
   });
 };
@@ -112,13 +74,11 @@ const printLog = (
   padLength: number,
   color: chalk.Chalk,
 ) => {
-  const servicePrefix = color(
-    chalk`{bold [H] ${serviceName.padEnd(padLength)} | }`,
-  );
-  console.log(servicePrefix + log);
+  const paddedName = serviceName.padEnd(padLength);
+  const prefix = color(chalk.bold(`[H] ${paddedName} | `));
+  console.log(prefix + log);
 };
 
-// TODO: Implement line skipping!
 export const logServices = async () => {
   const services = await readServices();
   const serviceNames = services.map(({ name }) => name);
@@ -130,7 +90,7 @@ export const logServices = async () => {
   });
 
   const logs: Log[] = [];
-  const initialLinesForService: { [name: string]: number } = {};
+  const initialCharsForService: { [name: string]: number } = {};
 
   for (const serviceName of serviceNames) {
     const fileName = `${CHIP_LOGS_DIR}/${PROJECT_NAME}/${serviceName}.log.timestamps`;
@@ -142,7 +102,7 @@ export const logServices = async () => {
         const log = line.substring(firstSpace + 1);
         return { timestamp, log, serviceName };
       });
-      initialLinesForService[serviceName] = lines.length;
+      initialCharsForService[serviceName] = contents.length + 1;
       logs.push(...lines);
     }
   }
@@ -160,6 +120,7 @@ export const logServices = async () => {
         serviceName,
         longestServiceName,
         colorForService[serviceName],
+        initialCharsForService[serviceName],
       );
     }
   }

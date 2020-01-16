@@ -26,7 +26,6 @@
     "lodash": "^4.17.15",
     "mz": "^2.7.0",
     "table": "^5.4.6",
-    "tail": "^2.0.3",
     "yargs": "^15.1.0"
   },
   "devDependencies": {
