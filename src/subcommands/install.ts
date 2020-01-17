@@ -21,12 +21,12 @@ export const installServices = async () => {
   const services = await readServices();
 
   log`Executing {bold preinstall} script`;
-  const { setup, install } = await readScripts();
+  const scripts = await readScripts();
 
   await exec(
     `
-    ${setup}
-    ${install}
+    ${scripts.setup}
+    ${scripts.install}
     `,
     { cwd: '.', live: true },
   );
