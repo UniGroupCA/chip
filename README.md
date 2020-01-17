@@ -30,5 +30,5 @@ If you are actively making changes to the source code you can run `yarn buildw` 
 
 ## Roadmap
 
-[ ] Implement `chip generate` command to automagically create `chip.yml` files by scanning directory structure.
-[ ] Implement subcommands for specific services.
+- [ ] Implement `chip generate` command to automagically create `chip.yml` files by scanning directory structure.
+- [ ] Implement subcommands for specific services.
