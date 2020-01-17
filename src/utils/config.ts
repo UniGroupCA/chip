@@ -4,6 +4,8 @@ import { readJsonFile, CHIP_PROCESSES_FILE } from './files';
 
 export interface ChipConfig {
   setup?: string;
+  install?: string;
+  'setup-service'?: string;
   services?: {
     [name: string]:
       | {
@@ -21,9 +23,13 @@ export const readConfig = async (): Promise<ChipConfig> => {
   return chipConfig;
 };
 
-export const readSetup = async (): Promise<string> => {
-  const { setup } = await readConfig();
-  return setup || '';
+export const readScripts = async () => {
+  const config = await readConfig();
+  return {
+    setup: config.setup || '',
+    install: config.install || '',
+    setupService: config['setup-service'] || '',
+  };
 };
 
 export const readServices = async (): Promise<{
