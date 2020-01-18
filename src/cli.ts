@@ -31,17 +31,24 @@ yargs
     'start [services..]',
     'Start services in project',
     async (yargs) => {
-      yargs.positional('services', { describe: 'service names or labels' });
+      yargs.positional('services', { describe: 'service names' });
     },
     async ({ services }) => {
       await initChip();
       await startServices(services);
     },
   )
-  .command('stop', 'Stop all services in project', {}, async () => {
-    await initChip();
-    await stopServices();
-  })
+  .command<{ services: string[] }>(
+    'stop [services..]',
+    'Stop services in project',
+    async (yargs) => {
+      yargs.positional('services', { describe: 'service names' });
+    },
+    async ({ services }) => {
+      await initChip();
+      await stopServices(services);
+    },
+  )
   .command('logs', 'View logs for all services in project', {}, async () => {
     await initChip();
     await logServices();

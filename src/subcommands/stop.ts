@@ -25,10 +25,14 @@ export const stopProcess = async (name: string, pid: number) => {
 //   }
 // };
 
-export const stopServices = async () => {
+export const stopServices = async (serviceWhitelist: string[] = []) => {
   const processes = await getActiveProcesses(PROJECT_NAME);
 
-  for (const [name, { pid }] of Object.entries(processes)) {
+  const filteredProcesses = Object.entries(processes).filter(
+    ([name]) => serviceWhitelist.length == 0 || serviceWhitelist.includes(name),
+  );
+
+  for (const [name, { pid }] of filteredProcesses) {
     await stopProcess(name, pid);
   }
 };
