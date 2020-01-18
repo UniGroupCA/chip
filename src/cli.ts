@@ -27,10 +27,17 @@ yargs
       await installServices();
     },
   )
-  .command('start', 'Start all services in project', {}, async () => {
-    await initChip();
-    await startServices();
-  })
+  .command<{ services: string[] }>(
+    'start [services..]',
+    'Start services in project',
+    async (yargs) => {
+      yargs.positional('services', { describe: 'service names or labels' });
+    },
+    async ({ services }) => {
+      await initChip();
+      await startServices(services);
+    },
+  )
   .command('stop', 'Stop all services in project', {}, async () => {
     await initChip();
     await stopServices();

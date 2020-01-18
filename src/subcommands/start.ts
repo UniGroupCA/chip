@@ -33,12 +33,12 @@ export const startService = async (serviceName: string, run: string) => {
   await persistPid(PROJECT_NAME, serviceName, subprocess.pid);
 };
 
-export const startServices = async () => {
+export const startServices = async (serviceWhitelist?: string[]) => {
   if (await fs.exists(`./docker-compose.yml`)) {
     await exec(`docker-compose up -d`, { cwd: '.', live: true });
   }
 
-  const services = await readServices();
+  const services = await readServices(serviceWhitelist);
   const activeProcesses = await getActiveProcesses(PROJECT_NAME);
 
   for (const { name, run } of services) {

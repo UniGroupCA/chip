@@ -32,17 +32,22 @@ export const readScripts = async () => {
   };
 };
 
-export const readServices = async (): Promise<{
+export const readServices = async (
+  whitelist: string[] = [],
+): Promise<{
   name: string;
   repo?: string;
   install?: string;
   run?: string;
 }[]> => {
   const { services = {} } = await readConfig();
-  return Object.entries(services).map(([name, values]) => ({
+  const allServices = Object.entries(services).map(([name, values]) => ({
     name,
     ...values,
   }));
+  return whitelist.length > 0
+    ? allServices.filter((service) => whitelist.includes(service.name))
+    : allServices;
 };
 
 export interface Processes {
