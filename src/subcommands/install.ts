@@ -17,8 +17,8 @@ export const installService = async (name: string, install: string) => {
   );
 };
 
-export const installServices = async () => {
-  const services = await readServices();
+export const installServices = async (serviceWhitelist?: string[]) => {
+  const services = await readServices(serviceWhitelist);
 
   log`Executing {bold preinstall} script`;
   const scripts = await readScripts();

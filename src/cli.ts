@@ -18,13 +18,15 @@ yargs
       await syncServices();
     },
   )
-  .command(
-    'install',
-    'Install dependencies for all services in project',
-    {},
-    async () => {
+  .command<{ services: string[] }>(
+    'install [services..]',
+    'Install dependencies for services in project',
+    async (yargs) => {
+      yargs.positional('services', { describe: 'service names' });
+    },
+    async ({ services }) => {
       await initChip();
-      await installServices();
+      await installServices(services);
     },
   )
   .command<{ services: string[] }>(
