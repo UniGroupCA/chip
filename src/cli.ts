@@ -51,10 +51,17 @@ yargs
       await stopServices(services);
     },
   )
-  .command('logs', 'View logs for all services in project', {}, async () => {
-    await initChip();
-    await logServices();
-  })
+  .command<{ services: string[] }>(
+    'logs [services..]',
+    'View logs for services in project',
+    async (yargs) => {
+      yargs.positional('services', { describe: 'service names' });
+    },
+    async ({ services }) => {
+      await initChip();
+      await logServices(services);
+    },
+  )
   .command('list', 'List all services in project', {}, async () => {
     await initChip();
     await listServices();
