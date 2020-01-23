@@ -59,6 +59,7 @@ export const listServices = async () => {
       ]);
     }
   }
+
   console.log(
     table(tableData, {
       drawHorizontalLine: (idx, size) => idx === 0 || idx === 1 || idx === size,

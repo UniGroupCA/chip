@@ -4,6 +4,7 @@ import { PROJECT_NAME, CHIP_LOGS_DIR } from '../utils/files';
 import { log } from '../utils/log';
 import { persistPid, getActiveProcesses, createLogStream } from '../utils/ps';
 import { exec, execDetached } from '../utils/processes';
+import { printError } from '../utils/errors';
 
 // TODO: Include process timestamp in identifier to avoid PID conflicts across reboots
 // TODO: Monitor detached processes to determine if they succesfully started or not
@@ -50,7 +51,7 @@ export const startServices = async (serviceWhitelist?: string[]) => {
         await startService(name, run);
       }
     } catch (e) {
-      console.error(e);
+      printError(e);
     }
   }
 };

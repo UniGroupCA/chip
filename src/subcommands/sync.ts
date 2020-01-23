@@ -2,6 +2,7 @@ import * as git from '../utils/git';
 import { readServices } from '../utils/config';
 import { fileExists, CWD } from '../utils/files';
 import { log } from '../utils/log';
+import { printError } from '../utils/errors';
 
 export const syncService = async (name: string, repo: string) => {
   const repoDir = `${CWD}/${name}`;
@@ -24,7 +25,7 @@ export const syncServices = async () => {
     try {
       await syncService(name, repo);
     } catch (e) {
-      console.error(e);
+      printError(e);
     }
   }
 };

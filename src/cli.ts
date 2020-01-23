@@ -1,8 +1,10 @@
 import yargs from 'yargs';
 
+import { initChip } from './utils/ps';
+import { handleErrors } from './utils/errors';
+
 import { syncServices } from './subcommands/sync';
 import { installServices } from './subcommands/install';
-import { initChip } from './utils/ps';
 import { startServices } from './subcommands/start';
 import { stopServices } from './subcommands/stop';
 import { listServices } from './subcommands/list';
@@ -13,10 +15,10 @@ yargs
     'sync',
     'Clone or pull repos for all services in project',
     {},
-    async () => {
+    handleErrors(async () => {
       await initChip();
       await syncServices();
-    },
+    }),
   )
   .command<{ services: string[] }>(
     'install [services..]',
@@ -24,10 +26,10 @@ yargs
     async (yargs) => {
       yargs.positional('services', { describe: 'service names' });
     },
-    async ({ services }) => {
+    handleErrors(async ({ services }) => {
       await initChip();
       await installServices(services);
-    },
+    }),
   )
   .command<{ services: string[] }>(
     'start [services..]',
@@ -35,10 +37,10 @@ yargs
     async (yargs) => {
       yargs.positional('services', { describe: 'service names' });
     },
-    async ({ services }) => {
+    handleErrors(async ({ services }) => {
       await initChip();
       await startServices(services);
-    },
+    }),
   )
   .command<{ services: string[] }>(
     'stop [services..]',
@@ -46,10 +48,10 @@ yargs
     async (yargs) => {
       yargs.positional('services', { describe: 'service names' });
     },
-    async ({ services }) => {
+    handleErrors(async ({ services }) => {
       await initChip();
       await stopServices(services);
-    },
+    }),
   )
   .command<{ services: string[] }>(
     'logs [services..]',
@@ -57,15 +59,20 @@ yargs
     async (yargs) => {
       yargs.positional('services', { describe: 'service names' });
     },
-    async ({ services }) => {
+    handleErrors(async ({ services }) => {
       await initChip();
       await logServices(services);
-    },
+    }),
   )
-  .command('list', 'List all services in project', {}, async () => {
-    await initChip();
-    await listServices();
-  })
+  .command(
+    'list',
+    'List all services in project',
+    {},
+    handleErrors(async () => {
+      await initChip();
+      await listServices();
+    }),
+  )
   .help()
   .strict()
   .demandCommand().argv;

@@ -1,6 +1,7 @@
 import { readServices, readScripts } from '../utils/config';
 import { exec } from '../utils/processes';
 import { log } from '../utils/log';
+import { printError } from '../utils/errors';
 
 export const installService = async (name: string, install: string) => {
   log`Installing dependencies for {bold ${name}}`;
@@ -36,7 +37,7 @@ export const installServices = async (serviceWhitelist?: string[]) => {
     try {
       await installService(name, install);
     } catch (e) {
-      console.error(e);
+      printError(e);
     }
   }
 };
