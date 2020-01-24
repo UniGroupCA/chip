@@ -8,6 +8,28 @@ import { getActiveProcesses } from '../utils/ps';
 import { PROJECT_NAME } from '../utils/files';
 import { exec } from '../utils/processes';
 
+const dockerServices = async () => {
+  const services: string[][] = [];
+
+  if (await fs.exists(`./docker-compose.yml`)) {
+    const rawOutput = await exec(`docker-compose ps`, {
+      cwd: '.',
+      live: false,
+    });
+
+    const trimmedOutput = rawOutput
+      .split('\n')
+      .slice(2)
+      .filter(Boolean);
+
+    for (const line of trimmedOutput) {
+      const [name, cmd, status] = line.split(/\s{3,}/g);
+      services.push([name, cmd, status, '', '']);
+    }
+  }
+  return services;
+};
+
 // TODO: Log orphans
 export const listServices = async () => {
   const services = await readServices();
@@ -36,29 +58,7 @@ export const listServices = async () => {
     ]);
   }
 
-  if (await fs.exists(`./docker-compose.yml`)) {
-    const psOutput = await exec(`docker-compose ps`, {
-      cwd: '.',
-      live: false,
-    });
-
-    const psTrimmed = psOutput
-      .split('\n')
-      .slice(2)
-      .filter(Boolean);
-
-    for (const line of psTrimmed) {
-      const [name, cmd, status] = line.split(/\s{3,}/g);
-
-      tableData.push([
-        name,
-        cmd.substring(0, 20) + (cmd.length > 20 ? '...' : ''),
-        status,
-        '',
-        '',
-      ]);
-    }
-  }
+  tableData.push(...(await dockerServices()));
 
   console.log(
     table(tableData, {
