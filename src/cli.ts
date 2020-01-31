@@ -7,6 +7,7 @@ import { syncServices } from './subcommands/sync';
 import { installServices } from './subcommands/install';
 import { startServices } from './subcommands/start';
 import { stopServices } from './subcommands/stop';
+import { restartServices } from './subcommands/restart';
 import { listServices } from './subcommands/list';
 import { logServices } from './subcommands/logs';
 
@@ -51,6 +52,17 @@ yargs
     handleErrors(async ({ services }) => {
       await initChip();
       await stopServices(services);
+    }),
+  )
+  .command<{ services: string[] }>(
+    'restart <services..>',
+    'Stop and restart services in project',
+    async (yargs) => {
+      yargs.positional('services', { describe: 'service names' });
+    },
+    handleErrors(async ({ services }) => {
+      await initChip();
+      await restartServices(services);
     }),
   )
   .command<{ services: string[] }>(
