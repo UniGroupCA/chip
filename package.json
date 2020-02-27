@@ -1,6 +1,7 @@
 {
   "name": "@qdivision/chip",
-  "version": "1.0.1",
+  "version": "1.0.2",
+  "description": "Easily manage microservices and infrastructure for local development",
   "files": [
     "build/",
     "assets/",
@@ -46,5 +47,17 @@
     "@types/yargs": "^13.0.4",
     "prettier": "^1.19.1",
     "typescript": "^3.7.4"
-  }
+  },
+  "homepage": "https://github.com/QDivision/chip",
+  "repository": "git+https://github.com/QDivision/chip.git",
+  "bugs": {
+    "url": "https://github.com/QDivision/chip/issues"
+  },
+  "keywords": [
+    "chip",
+    "qdivision",
+    "microservices",
+    "infrastructure",
+    "database"
+  ]
 }
