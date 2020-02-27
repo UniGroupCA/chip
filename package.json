@@ -1,6 +1,16 @@
 {
   "name": "@qdivision/chip",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "files": [
+    "build/",
+    "assets/",
+    "src/",
+    "chip-log-stamper.js",
+    "chip.js",
+    "package.json",
+    "README.md",
+    "yarn.lock"
+  ],
   "contributors": [
     "Andrew Dillon <andrew.dillon.j@gmail.com>",
     "Jason Hatton",
