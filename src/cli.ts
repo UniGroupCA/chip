@@ -55,7 +55,7 @@ yargs
     }),
   )
   .command<{ services: string[] }>(
-    'restart <services..>',
+    'restart [services..]',
     'Stop and restart services in project',
     async (yargs) => {
       yargs.positional('services', { describe: 'service names' });

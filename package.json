@@ -1,6 +1,17 @@
 {
   "name": "@qdivision/chip",
-  "version": "1.0.0",
+  "version": "1.0.3",
+  "description": "Easily manage microservices and infrastructure for local development",
+  "files": [
+    "build/",
+    "assets/",
+    "src/",
+    "chip-log-stamper.js",
+    "chip.js",
+    "package.json",
+    "README.md",
+    "yarn.lock"
+  ],
   "contributors": [
     "Andrew Dillon <andrew.dillon.j@gmail.com>",
     "Jason Hatton",
@@ -36,5 +47,17 @@
     "@types/yargs": "^13.0.4",
     "prettier": "^1.19.1",
     "typescript": "^3.7.4"
-  }
+  },
+  "homepage": "https://github.com/QDivision/chip",
+  "repository": "git+https://github.com/QDivision/chip.git",
+  "bugs": {
+    "url": "https://github.com/QDivision/chip/issues"
+  },
+  "keywords": [
+    "chip",
+    "qdivision",
+    "microservices",
+    "infrastructure",
+    "database"
+  ]
 }
