@@ -19,12 +19,14 @@ export const startService = async (serviceName: string, run: string) => {
   const out = await createLogStream(PROJECT_NAME, serviceName);
   const subprocess = execDetached(
     // Make sure stdout/stderr both get piped to `chip-log-stamper` even if the
-    // `run` command fails.
+    // `run` command fails. Also prevent stdin from being closed on the `run`
+    // command, because some tools exit when they detect their stdin stream
+    // has closed (such as `react-scripts start`: https://github.com/facebook/create-react-app/blob/2da5517689b7510ff8d8b0148ce372782cb285d7/packages/react-scripts/scripts/start.js#L156-L161).
     `
     function setup_and_run {
       ${setup}
       ${setupService}
-      ${run}
+      tail -f /dev/null | ${run}
     }
     (setup_and_run || true) 2>&1 | chip-log-stamper ${stampFile}
     `,
