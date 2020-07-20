@@ -1,3 +1,4 @@
+import process from 'process';
 import fs from 'mz/fs';
 import yaml from 'js-yaml';
 import { readJsonFile, CHIP_PROCESSES_FILE } from './files';
@@ -17,8 +18,22 @@ export interface ChipConfig {
   };
 }
 
+const readChipYml = async (): Promise<string> => {
+  while (true) {
+    try {
+      return await fs.readFile('./chip.yml', 'utf8');
+    } catch (err) {
+      if (err.code === 'ENOENT' && process.cwd() !== '/') {
+        process.chdir('../');
+      } else {
+        throw err;
+      }
+    }
+  }
+};
+
 export const readConfig = async (): Promise<ChipConfig> => {
-  const chipYml = await fs.readFile('./chip.yml', 'utf8');
+  const chipYml = await readChipYml();
   const chipConfig = await yaml.safeLoad(chipYml);
   return chipConfig;
 };
