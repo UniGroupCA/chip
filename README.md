@@ -11,7 +11,21 @@
    Easily manage microservices and infrastructure for local development 
 </div>
 
-## Developer Installation
+## Installation
+
+Run the following command to install `chip` from NPM:
+
+```
+yarn global add @qdivision/chip
+```
+
+You can update your installation by running:
+
+```
+yarn global upgrade @qdivision/chip
+```
+
+## Development Installation
 
 Run the following commands to clone the `chip` source code and set it up for development it on your machine.
 
