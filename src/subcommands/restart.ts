@@ -10,16 +10,16 @@ export const restartServices = async (serviceWhitelist?: string[]) => {
   const services = await readServices(serviceWhitelist);
   const activeProcesses = await getActiveProcesses(PROJECT_NAME);
 
-  for (const { name, run } of services) {
+  for (const { name, run, secrets } of services) {
     if (!run) continue;
     try {
       if (activeProcesses[name]) {
         await stopProcess(name, activeProcesses[name].pid);
         await new Promise((r) => setTimeout(r, 2000));
-        await startService(name, run);
+        await startService(name, run, secrets);
       } else {
         log`Service {bold ${name}} not running`;
-        await startService(name, run);
+        await startService(name, run, secrets);
       }
     } catch (e) {
       printError(e);
