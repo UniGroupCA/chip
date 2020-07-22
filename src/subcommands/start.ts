@@ -9,7 +9,11 @@ import { printError } from '../utils/errors';
 // TODO: Include process timestamp in identifier to avoid PID conflicts across reboots
 // TODO: Monitor detached processes to determine if they succesfully started or not
 // TODO: Only start if it's not already running
-export const startService = async (serviceName: string, run: string) => {
+export const startService = async (
+  serviceName: string,
+  run: string,
+  secrets: { [name: string]: string },
+) => {
   log`Starting service {bold ${serviceName}}`;
 
   const { setup, setupService } = await readScripts();
@@ -30,7 +34,7 @@ export const startService = async (serviceName: string, run: string) => {
     }
     (setup_and_run || true) 2>&1 | chip-log-stamper ${stampFile}
     `,
-    { cwd: serviceName, out },
+    { cwd: serviceName, out, env: { ...process.env, ...secrets } },
   );
 
   await persistPid(PROJECT_NAME, serviceName, subprocess.pid);
@@ -44,13 +48,13 @@ export const startServices = async (serviceWhitelist?: string[]) => {
   const services = await readServices(serviceWhitelist);
   const activeProcesses = await getActiveProcesses(PROJECT_NAME);
 
-  for (const { name, run } of services) {
+  for (const { name, run, secrets } of services) {
     if (!run) continue;
     try {
       if (activeProcesses[name]) {
         log`Already running service {bold ${name}}`;
       } else {
-        await startService(name, run);
+        await startService(name, run, secrets);
       }
     } catch (e) {
       printError(e);

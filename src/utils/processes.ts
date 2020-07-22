@@ -3,13 +3,14 @@ import { spawn, ChildProcess } from 'child_process';
 export interface ExecOptions {
   cwd?: string;
   live?: boolean;
+  env?: NodeJS.ProcessEnv;
 }
 
 export const exec = (
   command: string,
-  { cwd, live }: ExecOptions = {},
+  { cwd, live, env }: ExecOptions = {},
 ): Promise<string> => {
-  const child = spawn('bash', ['-c', command], { cwd });
+  const child = spawn('bash', ['-c', command], { cwd, env });
 
   if (live) {
     child.stdout.pipe(process.stdout);
@@ -36,14 +37,16 @@ export const exec = (
 export interface SpawnOptions {
   cwd?: string;
   out?: number;
+  env?: NodeJS.ProcessEnv;
 }
 
 export const execDetached = (
   command: string,
-  { cwd, out }: SpawnOptions = {},
+  { cwd, out, env }: SpawnOptions = {},
 ): ChildProcess => {
   const subprocess = spawn('bash', ['-c', command], {
     cwd,
+    env,
     stdio: out ? ['ignore', out, out] : 'inherit',
     detached: true,
   });

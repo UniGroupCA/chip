@@ -17,10 +17,21 @@ export interface ChipConfig {
   };
 }
 
+export interface ChipSecrets {
+  services?: {
+    [name: string]: string | undefined;
+  };
+}
+
 export const readConfig = async (): Promise<ChipConfig> => {
   const chipYml = await fs.readFile('./chip.yml', 'utf8');
   const chipConfig = await yaml.safeLoad(chipYml);
   return chipConfig;
+};
+export const readSecrets = async (): Promise<ChipSecrets> => {
+  const secretYml = await fs.readFile('./secretchip.yml', 'utf8');
+  const secretConfig = await yaml.safeLoad(secretYml);
+  return secretConfig;
 };
 
 export const readScripts = async () => {
@@ -39,12 +50,19 @@ export const readServices = async (
   repo?: string;
   install?: string;
   run?: string;
+  secrets: { [name: string]: string };
 }[]> => {
-  const { services = {} } = await readConfig();
-  const allServices = Object.entries(services).map(([name, values]) => ({
-    name,
-    ...values,
-  }));
+  const config = await readConfig();
+  const secrets = await readSecrets();
+
+  const allServices = Object.entries(config.services ?? {}).map(
+    ([name, values]) => ({
+      ...values,
+      name,
+      secrets: secrets.services?.[name] ?? {},
+    }),
+  );
+
   return whitelist.length > 0
     ? allServices.filter((service) => whitelist.includes(service.name))
     : allServices;
