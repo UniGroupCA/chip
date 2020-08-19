@@ -28,10 +28,16 @@ export const readConfig = async (): Promise<ChipConfig> => {
   const chipConfig = await yaml.safeLoad(chipYml);
   return chipConfig;
 };
+
 export const readSecrets = async (): Promise<ChipSecrets> => {
-  const secretYml = await fs.readFile('./secretchip.yml', 'utf8');
-  const secretConfig = await yaml.safeLoad(secretYml);
-  return secretConfig;
+  try {
+    const secretYml = await fs.readFile('./secretchip.yml', 'utf8');
+    const secretConfig = await yaml.safeLoad(secretYml);
+    return secretConfig;
+  } catch (e) {
+    if (e.code === 'ENOENT') return {};
+    else throw e;
+  }
 };
 
 export const readScripts = async () => {
