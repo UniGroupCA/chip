@@ -42,7 +42,63 @@ Note that you must run `yarn build` each time you make a change to the `.ts` sou
 
 If you are actively making changes to the source code you can run `yarn buildw` to start a process that will automatically detect changes to the source files and recompile the project for you. This is the fastest and easiest way to develop `chip`.
 
-## Roadmap
+## Sample `chip.yml`
 
-- [ ] Implement `chip generate` command to automagically create `chip.yml` files by scanning directory structure.
-- [x] Implement subcommands for specific services.
+```yml
+# Runs at start of every `install` and `run` subprocess
+setup: |
+  export sdkman_auto_answer=true
+  source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+  export NVM_DIR="$HOME/.nvm"
+
+  if [ -f "$NVM_DIR/nvm.sh" ]; then
+      . "$NVM_DIR/nvm.sh"
+  else
+      . "/usr/local/opt/nvm/nvm.sh"
+  fi
+
+# Runs before `install` subprocesses for services
+install: |
+  echo "no" | sdk install java 11.0.2-open
+  nvm install 10.16.3
+
+# Runs at start of every service-level `install` and `run` subprocess,
+# after `setup`
+setup-service: |
+  echo "no" | sdk use java 11.0.2-open
+  nvm use 10.16.3
+
+services:
+  sandwich-ui:
+    repo: 'git@github.com:QDivision/sandwich-ui.git'
+    install: 'yarn install'
+    run: 'yarn start'
+
+  sandwich-api:
+    repo: 'git@github.com:QDivision/sandwich-api.git'
+    install: 'mvn clean package -D maven.test.skip=true'
+    run: 'mvn spring-boot:run -D spring-boot.run.profiles=local'
+
+  initializer:
+    repo: 'git@github.com:QDivision/initializer.git'
+    install: 'yarn install'
+```
+
+## Sample `secretchip.yml`
+
+**WARNING:** The `secretchip.yml` file should not be committed to Git! Please be sure to add it to your `.gitignore`!
+
+```yml
+services:
+  sandwich-ui:
+    API_KEY: 'foo'
+
+  sandwich-api:
+    DB_USERNAME: 'qux'
+    DB_PASSWORD: 'baz'
+
+  initializer:
+    DB_USERNAME: 'qux'
+    DB_PASSWORD: 'baz'
+```
