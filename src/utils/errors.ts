@@ -1,7 +1,8 @@
 import { log } from './log';
 
-export const printError = ({ output, message }: any) => {
-  log`{red Error:} ${(output || message).trim()}`;
+export const printError = (error: any) => {
+  log`{red An error occurred}`;
+  console.error(error);
 };
 
 export const handleErrors = <T>(fn: (args: T) => Promise<void>) => async (
