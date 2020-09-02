@@ -12,7 +12,8 @@ import { printError } from '../utils/errors';
 export const startService = async (
   serviceName: string,
   run: string,
-  secrets: { [name: string]: string },
+  env: { [envVar: string]: string },
+  secrets: { [envVar: string]: string },
 ) => {
   log`Starting service {bold ${serviceName}}`;
 
@@ -34,7 +35,7 @@ export const startService = async (
     }
     (setup_and_run || true) 2>&1 | chip-log-stamper ${stampFile}
     `,
-    { cwd: serviceName, out, env: { ...process.env, ...secrets } },
+    { cwd: serviceName, out, env: { ...process.env, ...env, ...secrets } },
   );
 
   await persistPid(PROJECT_NAME, serviceName, subprocess.pid);
@@ -48,13 +49,13 @@ export const startServices = async (serviceWhitelist?: string[]) => {
   const services = await readServices(serviceWhitelist);
   const activeProcesses = await getActiveProcesses(PROJECT_NAME);
 
-  for (const { name, run, secrets } of services) {
+  for (const { name, run, env, secrets } of services) {
     if (!run) continue;
     try {
       if (activeProcesses[name]) {
         log`Already running service {bold ${name}}`;
       } else {
-        await startService(name, run, secrets);
+        await startService(name, run, env, secrets);
       }
     } catch (e) {
       printError(e);
