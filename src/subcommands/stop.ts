@@ -1,6 +1,5 @@
 import chalk from 'chalk';
 import fs from 'mz/fs';
-import { execSync } from 'child_process';
 
 import { exec } from '../utils/processes';
 import { processExists, getActiveProcesses } from '../utils/ps';
@@ -11,7 +10,10 @@ export const stopProcess = async (name: string, pid: number) => {
   console.log(chalk`Stopping {bold ${name}} with pid {bold ${pid}}`);
   if (await processExists(pid)) {
     // https://stackoverflow.com/a/8406413
-    execSync(`kill -TERM -${pid}`);
+    await exec(`kill -SIGINT -${pid}`);
+
+    // TODO: Add a `chip stop --force` flag that uses `-TERM` signal:
+    // execSync(`kill -TERM -${pid}`);
   } else {
     console.log(chalk`Unknown process with pid {bold ${pid}}`);
   }

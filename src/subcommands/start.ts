@@ -6,9 +6,6 @@ import { persistPid, getActiveProcesses, createLogStream } from '../utils/ps';
 import { exec, execDetached } from '../utils/processes';
 import { printError } from '../utils/errors';
 
-// TODO: Include process timestamp in identifier to avoid PID conflicts across reboots
-// TODO: Monitor detached processes to determine if they succesfully started or not
-// TODO: Only start if it's not already running
 export const startService = async (
   serviceName: string,
   run: string,
