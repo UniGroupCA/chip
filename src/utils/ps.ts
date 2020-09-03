@@ -26,6 +26,20 @@ export const processExists = async (pid: number) => {
   }
 };
 
+/**
+ * Returns the process start time as unix timestamp or `undefined` if no
+ * process with the given `pid` exists
+ */
+export const processStartTime = async (pid: number) => {
+  try {
+    // Sample output: `Wed Sep  2 11:17:24 2020`
+    const startDate = await exec(`ps -p ${pid} -o lstart=`);
+    return new Date(startDate).getTime();
+  } catch (e) {
+    return undefined;
+  }
+};
+
 export const persistPid = async (
   projectName: string,
   serviceName: string,
