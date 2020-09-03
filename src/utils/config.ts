@@ -12,6 +12,7 @@ export interface ChipConfig {
           repo?: string;
           install?: string;
           run?: string;
+          env?: { [envVar: string]: string };
         }
       | undefined;
   };
@@ -19,7 +20,7 @@ export interface ChipConfig {
 
 export interface ChipSecrets {
   services?: {
-    [name: string]: string | undefined;
+    [envVar: string]: string;
   };
 }
 
@@ -56,6 +57,7 @@ export const readServices = async (
   repo?: string;
   install?: string;
   run?: string;
+  env: { [envVar: string]: string };
   secrets: { [name: string]: string };
 }[]> => {
   const config = await readConfig();
@@ -65,6 +67,7 @@ export const readServices = async (
     ([name, values]) => ({
       ...values,
       name,
+      env: values?.env ?? {},
       secrets: secrets.services?.[name] ?? {},
     }),
   );

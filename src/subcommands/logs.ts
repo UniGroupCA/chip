@@ -22,7 +22,7 @@ export const logService = async (
 
     rl.on('line', (line) => {
       const paddedName = serviceName.padEnd(padLength);
-      const prefix = color(chalk.bold(`[L] ${paddedName} | `));
+      const prefix = color(chalk.bold(`${paddedName} | `));
       console.log(prefix + line);
     });
 
@@ -78,7 +78,7 @@ const printLog = (
   color: chalk.Chalk,
 ) => {
   const paddedName = serviceName.padEnd(padLength);
-  const prefix = color(chalk.bold(`[H] ${paddedName} | `));
+  const prefix = color(chalk.bold(`${paddedName}* | `));
   console.log(prefix + log);
 };
 
