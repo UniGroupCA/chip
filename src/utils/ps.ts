@@ -27,7 +27,7 @@ export const processExists = async (pid: number) => {
 };
 
 /**
- * Returns the process start time as unix timestamp or `undefined` if no
+ * Returns the process start time as unix timestamp. Throws an error if no
  * process with the given `pid` exists
  */
 export const lookupStartTime = async (pid: number) => {
