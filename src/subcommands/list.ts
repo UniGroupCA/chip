@@ -44,9 +44,11 @@ export const listServices = async () => {
       if (exists) {
         if (startTime) {
           const uptime = Date.now() - startTime!;
-          status = green(
-            `Up ${humanize(uptime, { largest: 1, maxDecimalPoints: 0 })}`,
-          );
+          const prettyUptime = humanize(uptime, {
+            largest: 1,
+            maxDecimalPoints: 0,
+          });
+          status = green(`Up ${prettyUptime}`);
         } else {
           // Handle cases where `startTime === undefined` for backwards
           // compatibility
