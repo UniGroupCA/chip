@@ -44,7 +44,6 @@ If you are actively making changes to the source code you can run `yarn buildw` 
 
 If chip was initially installed through Yarn and you want to switch to a development installation, you may need to run `yarn global unlink` in the chip directory and then rerun the above install, build, and link commands.
 
-
 ## Sample `chip.yml`
 
 ```yml
