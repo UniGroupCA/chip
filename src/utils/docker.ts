@@ -7,7 +7,7 @@ import { CWD } from '../utils/files';
 import { exec } from '../utils/processes';
 
 const capitalize = (value: string) =>
-  value.substring(0, 1).toUpperCase() + value.substring(1);
+  value.substring(0, 1).toUpperCase() + value.substring(1).toLowerCase();
 
 const run = (cmd: string) => exec(cmd, { cwd: '.', live: false });
 
@@ -20,6 +20,30 @@ const parseTable = (rawTable: string, skipRows = 0) =>
 
 /** Returns `true` if a `docker-compose.yml` file is present in the project */
 export const isPresent = () => fs.existsSync(`${CWD}/docker-compose.yml`);
+
+/**
+ * Start specified docker-compose services in this project.
+ * If no services are specified, all of them will be started.
+ */
+export const up = (services: string[] = []) =>
+  exec(`docker-compose up -d ${services.join(' ')}`, { cwd: CWD, live: true });
+
+/**
+ * Stop specified docker-compose services in this project.
+ * If no services are specified, all of them will be stopped.
+ */
+export const stop = (services: string[] = []) =>
+  exec(`docker-compose stop ${services.join(' ')}`, { cwd: CWD, live: true });
+
+/**
+ * Remove containers for specified docker-compose services in this project.
+ * If no services are specified, all of them will be removed.
+ */
+export const rm = (services: string[] = []) =>
+  exec(`docker-compose rm --stop --force ${services.join(' ')}`, {
+    cwd: CWD,
+    live: true,
+  });
 
 export const composeServices = async (): Promise<{
   [serviceName: string]: { image: string };

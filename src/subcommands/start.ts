@@ -1,4 +1,6 @@
 import fs from 'mz/fs';
+
+import * as docker from '../utils/docker';
 import { readServices, readScripts } from '../utils/config';
 import { PROJECT_NAME, CHIP_LOGS_DIR } from '../utils/files';
 import { log } from '../utils/log';
@@ -39,8 +41,14 @@ export const startService = async (
 };
 
 export const startServices = async (serviceWhitelist?: string[]) => {
-  if (await fs.exists(`./docker-compose.yml`)) {
-    await exec(`docker-compose up -d`, { cwd: '.', live: true });
+  // if (await fs.exists(`./docker-compose.yml`)) {
+  // await exec(`docker-compose up -d`, { cwd: '.', live: true });
+  // }
+
+  if (docker.isPresent()) {
+    // TODO: Filter `serviceWhitelist` for docker services
+    // If no whitelist is passed, all docker services will be started
+    await docker.up();
   }
 
   const services = await readServices(serviceWhitelist);
