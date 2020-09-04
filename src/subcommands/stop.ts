@@ -1,5 +1,4 @@
 import chalk from 'chalk';
-import fs from 'mz/fs';
 
 import * as docker from '../utils/docker';
 import { exec } from '../utils/processes';
@@ -20,11 +19,12 @@ export const stopProcess = async (name: string, pid: number) => {
   }
 };
 
-export const stopServices = async (serviceWhitelist: string[] = []) => {
+export const stopServices = async (serviceWhitelist: string[]) => {
   const processes = await getActiveProcesses(PROJECT_NAME);
 
   const filteredProcesses = Object.entries(processes).filter(
-    ([name]) => serviceWhitelist.length == 0 || serviceWhitelist.includes(name),
+    ([name]) =>
+      serviceWhitelist.length === 0 || serviceWhitelist.includes(name),
   );
 
   for (const [name, { pid }] of filteredProcesses) {
@@ -35,20 +35,12 @@ export const stopServices = async (serviceWhitelist: string[] = []) => {
     }
   }
 
-  try {
-    if (docker.isPresent()) {
-      // TODO: Filter `serviceWhitelist` for docker services
-      // If no whitelist is passed, all docker services will be stopped
-      // Also support `chip stop --remove` cli flag to call `docker.rm()`
+  if (docker.isPresent()) {
+    if (serviceWhitelist.length === 0) {
       await docker.stop();
+    } else {
+      const dockerServices = await docker.composeServiceNames(serviceWhitelist);
+      if (dockerServices.length > 0) await docker.stop(dockerServices);
     }
-    // if (
-    //   serviceWhitelist.length === 0 &&
-    //   (await fs.exists(`./docker-compose.yml`))
-    // ) {
-    //   await exec(`docker-compose stop`, { cwd: '.', live: true });
-    // }
-  } catch (e) {
-    printError(e);
   }
 };

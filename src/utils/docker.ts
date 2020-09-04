@@ -25,21 +25,31 @@ export const isPresent = () => fs.existsSync(`${CWD}/docker-compose.yml`);
  * Start specified docker-compose services in this project.
  * If no services are specified, all of them will be started.
  */
-export const up = (services: string[] = []) =>
+export const up = async (services: string[] = []) =>
   exec(`docker-compose up -d ${services.join(' ')}`, { cwd: CWD, live: true });
 
 /**
  * Stop specified docker-compose services in this project.
  * If no services are specified, all of them will be stopped.
  */
-export const stop = (services: string[] = []) =>
+export const stop = async (services: string[] = []) =>
   exec(`docker-compose stop ${services.join(' ')}`, { cwd: CWD, live: true });
+
+/**
+ * Restart specified docker-compose services in this project.
+ * If no services are specified, all of them will be restarted.
+ */
+export const restart = async (services: string[] = []) =>
+  exec(`docker-compose restart ${services.join(' ')}`, {
+    cwd: CWD,
+    live: true,
+  });
 
 /**
  * Remove containers for specified docker-compose services in this project.
  * If no services are specified, all of them will be removed.
  */
-export const rm = (services: string[] = []) =>
+export const rm = async (services: string[] = []) =>
   exec(`docker-compose rm --stop --force ${services.join(' ')}`, {
     cwd: CWD,
     live: true,
@@ -51,6 +61,13 @@ export const composeServices = async (): Promise<{
   const composeYml = await fs.readFile(`${CWD}/docker-compose.yml`, 'utf8');
   const composeConfig = await yaml.safeLoad(composeYml);
   return composeConfig?.services ?? {};
+};
+
+/** Get names of docker-compose services in this project. */
+export const composeServiceNames = async (serviceWhitelist?: string[]) => {
+  const allServices = Object.keys(await composeServices());
+  if (!serviceWhitelist) return allServices;
+  return allServices.filter((n) => serviceWhitelist.includes(n));
 };
 
 /** Returns a list of all services in the `docker-compose.yml` file */

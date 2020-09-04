@@ -1,11 +1,9 @@
-import fs from 'mz/fs';
-
 import * as docker from '../utils/docker';
 import { readServices, readScripts } from '../utils/config';
 import { PROJECT_NAME, CHIP_LOGS_DIR } from '../utils/files';
 import { log } from '../utils/log';
 import { persistPid, getActiveProcesses, createLogStream } from '../utils/ps';
-import { exec, execDetached } from '../utils/processes';
+import { execDetached } from '../utils/processes';
 import { printError } from '../utils/errors';
 
 export const startService = async (
@@ -40,15 +38,14 @@ export const startService = async (
   await persistPid(PROJECT_NAME, serviceName, subprocess.pid);
 };
 
-export const startServices = async (serviceWhitelist?: string[]) => {
-  // if (await fs.exists(`./docker-compose.yml`)) {
-  // await exec(`docker-compose up -d`, { cwd: '.', live: true });
-  // }
-
+export const startServices = async (serviceWhitelist: string[]) => {
   if (docker.isPresent()) {
-    // TODO: Filter `serviceWhitelist` for docker services
-    // If no whitelist is passed, all docker services will be started
-    await docker.up();
+    if (serviceWhitelist.length === 0) {
+      await docker.up();
+    } else {
+      const dockerServices = await docker.composeServiceNames(serviceWhitelist);
+      if (dockerServices.length > 0) await docker.up(dockerServices);
+    }
   }
 
   const services = await readServices(serviceWhitelist);
