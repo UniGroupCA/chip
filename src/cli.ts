@@ -70,7 +70,7 @@ yargs
         alias: ['remove', 'rm'],
         type: 'boolean',
         describe:
-          'Whether or not to remove the containers after stopping them. Only applies to docker-compose services. If you have a database service and want wipe it clean, you could use this option.',
+          'Remove containers after stopping them. Only applies to docker-compose services. If you have a database service and want to clear/reset it, you could use this option.',
       }),
     handleErrors(async ({ services, remove = false }) => {
       await initChip();
