@@ -42,7 +42,14 @@ Note that you must run `yarn build` each time you make a change to the `.ts` sou
 
 If you are actively making changes to the source code you can run `yarn buildw` to start a process that will automatically detect changes to the source files and recompile the project for you. This is the fastest and easiest way to develop `chip`.
 
-If chip was initially installed through Yarn and you want to switch to a development installation, you may need to run `yarn global unlink` in the chip directory and then rerun the above install, build, and link commands.
+If chip was initially installed through Yarn and you want to switch to a development installation, you should run the following commands.
+
+```
+cd chip
+yarn global remove @qdivision/chip
+yarn unlink
+yarn link
+```
 
 ## Sample `chip.yml`
 
