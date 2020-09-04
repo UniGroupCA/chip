@@ -43,6 +43,8 @@ const prefixColors = [
   chalk.blue,
   chalk.magenta,
   chalk.cyan,
+
+  // TODO: Change these colors so there's more contrast
   chalk.redBright,
   chalk.greenBright,
   chalk.yellowBright,
@@ -77,8 +79,8 @@ const printLog = (
   padLength: number,
   color: chalk.Chalk,
 ) => {
-  const paddedName = serviceName.padEnd(padLength);
-  const prefix = color(chalk.bold(`${paddedName}* | `));
+  const paddedName = `${serviceName}*`.padEnd(padLength + 1);
+  const prefix = color(chalk.bold(`${paddedName} | `));
   console.log(prefix + log);
 };
 
