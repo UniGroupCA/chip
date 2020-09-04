@@ -6,6 +6,9 @@ import { green, red } from 'chalk';
 import { CWD } from '../utils/files';
 import { exec } from '../utils/processes';
 
+const capitalize = (value: string) =>
+  value.substring(0, 1).toUpperCase() + value.substring(1);
+
 const run = (cmd: string) => exec(cmd, { cwd: '.', live: false });
 
 const parseTable = (rawTable: string, skipRows = 0) =>
@@ -47,7 +50,7 @@ export const listServices = async () => {
     return {
       name: serviceName,
       image,
-      status: info?.status ? green(info.status) : red('Stopped'),
+      status: info?.status ? green(capitalize(info.status)) : red('Stopped'),
     };
   });
 };
