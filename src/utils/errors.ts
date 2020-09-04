@@ -1,8 +1,14 @@
 import { log } from './log';
 
-export const printError = (error: any) => {
-  log`{red An error occurred}`;
-  console.error(error);
+/**
+ * Prints a succinct error message (without a full stack trace). Useful
+ * for when non-fatal errors occur. Allows you to log them without polluting
+ * stdout/stderr with stack traces that detract from other important output.
+ */
+export const printError = ({ output, message }: any) => {
+  let msg = output || message || '---';
+  if (typeof msg === 'string') msg = msg.trim();
+  log`{red Error:} ${msg}`;
 };
 
 export const handleErrors = <T>(fn: (args: T) => Promise<void>) => async (
@@ -11,7 +17,8 @@ export const handleErrors = <T>(fn: (args: T) => Promise<void>) => async (
   try {
     await fn(args);
   } catch (e) {
-    printError(e);
+    log`{red An error occurred}`;
+    console.error(e);
     process.exit(1);
   }
 };

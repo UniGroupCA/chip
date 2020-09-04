@@ -77,11 +77,21 @@ export const readServices = async (
     : allServices;
 };
 
+/**
+ * All versions of chip since v1.2.1 should include `startTime` in these
+ * records. However, older versions of chip did not. Hence why `startTime` is
+ * optional.
+ */
+export interface ProcessRecord {
+  pid: number;
+
+  /** When the process was started (as a unix timestamp in milliseconds) */
+  startTime?: number;
+}
+
 export interface Processes {
   [projectName: string]:
-    | {
-        [serviceName: string]: { pid: number } | undefined;
-      }
+    | { [serviceName: string]: ProcessRecord | undefined }
     | undefined;
 }
 
