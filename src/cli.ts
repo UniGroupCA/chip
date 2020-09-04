@@ -62,13 +62,19 @@ yargs
       await startServices(services);
     }),
   )
-  .command<{ services: string[] }>(
+  .command<{ services: string[]; remove: boolean }>(
     'stop [services..]',
     'Stop services in project',
-    (yargs) => yargs.positional('services', { describe: 'service names' }),
-    handleErrors(async ({ services }) => {
+    (yargs) =>
+      yargs.positional('services', { describe: 'service names' }).option('r', {
+        alias: ['remove', 'rm'],
+        type: 'boolean',
+        describe:
+          'Whether or not to remove the containers after stopping them. Only applies to docker-compose services. If you have a database service and want wipe it clean, you could use this option.',
+      }),
+    handleErrors(async ({ services, remove = false }) => {
       await initChip();
-      await stopServices(services);
+      await stopServices(services, remove);
     }),
   )
   .command<{ services: string[] }>(

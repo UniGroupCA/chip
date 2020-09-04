@@ -19,7 +19,10 @@ export const stopProcess = async (name: string, pid: number) => {
   }
 };
 
-export const stopServices = async (serviceWhitelist: string[]) => {
+export const stopServices = async (
+  serviceWhitelist: string[],
+  removeDockerContainers = false,
+) => {
   const processes = await getActiveProcesses(PROJECT_NAME);
 
   const filteredProcesses = Object.entries(processes).filter(
@@ -37,10 +40,14 @@ export const stopServices = async (serviceWhitelist: string[]) => {
 
   if (docker.isPresent()) {
     if (serviceWhitelist.length === 0) {
-      await docker.stop();
+      if (removeDockerContainers) await docker.rm();
+      else await docker.stop();
     } else {
       const dockerServices = await docker.composeServiceNames(serviceWhitelist);
-      if (dockerServices.length > 0) await docker.stop(dockerServices);
+      if (dockerServices.length > 0) {
+        if (removeDockerContainers) await docker.rm(dockerServices);
+        else await docker.stop(dockerServices);
+      }
     }
   }
 };
