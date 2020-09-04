@@ -11,6 +11,7 @@ import { restartServices } from './subcommands/restart';
 import { listServices } from './subcommands/list';
 import { logServices } from './subcommands/logs';
 import { checkoutServices } from './subcommands/checkout';
+import { statusServices } from './subcommands/status';
 
 yargs
   .command<{ services: string[] }>(
@@ -32,6 +33,15 @@ yargs
     handleErrors(async ({ branch, services }) => {
       await initChip();
       await checkoutServices(branch, services);
+    }),
+  )
+  .command<{ services: string[] }>(
+    'status [services..]',
+    'Show git status for services in project',
+    (yargs) => yargs.positional('services', { describe: 'service names' }),
+    handleErrors(async ({ services }) => {
+      await initChip();
+      await statusServices(services);
     }),
   )
   .command<{ services: string[] }>(
