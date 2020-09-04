@@ -10,23 +10,34 @@ import { stopServices } from './subcommands/stop';
 import { restartServices } from './subcommands/restart';
 import { listServices } from './subcommands/list';
 import { logServices } from './subcommands/logs';
+import { checkoutServices } from './subcommands/checkout';
 
 yargs
-  .command(
-    'sync',
-    'Clone or pull repos for all services in project',
-    {},
-    handleErrors(async () => {
+  .command<{ services: string[] }>(
+    'sync [services..]',
+    'Clone or pull repos for services in project',
+    (yargs) => yargs.positional('services', { describe: 'service names' }),
+    handleErrors(async ({ services }) => {
       await initChip();
-      await syncServices();
+      await syncServices(services);
+    }),
+  )
+  .command<{ branch: string; services: string[] }>(
+    'checkout <branch> [services..]',
+    'Checkout a git branch for services in project',
+    (yargs) =>
+      yargs
+        .positional('branch', { describe: 'git branch name' })
+        .positional('services', { describe: 'service names' }),
+    handleErrors(async ({ branch, services }) => {
+      await initChip();
+      await checkoutServices(branch, services);
     }),
   )
   .command<{ services: string[] }>(
     'install [services..]',
     'Install dependencies for services in project',
-    async (yargs) => {
-      yargs.positional('services', { describe: 'service names' });
-    },
+    (yargs) => yargs.positional('services', { describe: 'service names' }),
     handleErrors(async ({ services }) => {
       await initChip();
       await installServices(services);
@@ -35,9 +46,7 @@ yargs
   .command<{ services: string[] }>(
     'start [services..]',
     'Start services in project',
-    async (yargs) => {
-      yargs.positional('services', { describe: 'service names' });
-    },
+    (yargs) => yargs.positional('services', { describe: 'service names' }),
     handleErrors(async ({ services }) => {
       await initChip();
       await startServices(services);
@@ -46,9 +55,7 @@ yargs
   .command<{ services: string[] }>(
     'stop [services..]',
     'Stop services in project',
-    async (yargs) => {
-      yargs.positional('services', { describe: 'service names' });
-    },
+    (yargs) => yargs.positional('services', { describe: 'service names' }),
     handleErrors(async ({ services }) => {
       await initChip();
       await stopServices(services);
@@ -57,9 +64,7 @@ yargs
   .command<{ services: string[] }>(
     'restart [services..]',
     'Stop and restart services in project',
-    async (yargs) => {
-      yargs.positional('services', { describe: 'service names' });
-    },
+    (yargs) => yargs.positional('services', { describe: 'service names' }),
     handleErrors(async ({ services }) => {
       await initChip();
       await restartServices(services);
@@ -68,9 +73,7 @@ yargs
   .command<{ services: string[] }>(
     'logs [services..]',
     'View logs for services in project',
-    async (yargs) => {
-      yargs.positional('services', { describe: 'service names' });
-    },
+    (yargs) => yargs.positional('services', { describe: 'service names' }),
     handleErrors(async ({ services }) => {
       await initChip();
       await logServices(services);
