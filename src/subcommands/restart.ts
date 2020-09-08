@@ -10,10 +10,14 @@ import { startService } from './start';
 export const restartServices = async (serviceWhitelist: string[]) => {
   if (docker.isPresent()) {
     if (serviceWhitelist.length === 0) {
-      await docker.restart();
+      await docker.stop();
+      await docker.up();
     } else {
       const dockerServices = await docker.composeServiceNames(serviceWhitelist);
-      if (dockerServices.length > 0) await docker.restart(dockerServices);
+      if (dockerServices.length > 0) {
+        await docker.stop(dockerServices);
+        await docker.up(dockerServices);
+      }
     }
   }
 
