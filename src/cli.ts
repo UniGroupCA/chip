@@ -77,13 +77,18 @@ yargs
       await stopServices(services, remove);
     }),
   )
-  .command<{ services: string[] }>(
+  .command<{ services: string[]; remove: boolean }>(
     'restart [services..]',
     'Stop and restart services in project',
-    (yargs) => yargs.positional('services', { describe: 'service names' }),
-    handleErrors(async ({ services }) => {
+    (yargs) => yargs.positional('services', { describe: 'service names' }).option('r', {
+      alias: ['remove', 'rm'],
+      type: 'boolean',
+      describe:
+        'Remove containers after stopping them. Only applies to docker-compose services. If you have a database service and want to clear/reset it, you could use this option.',
+    }),
+    handleErrors(async ({ services, remove = false }) => {
       await initChip();
-      await restartServices(services);
+      await restartServices(services, remove);
     }),
   )
   .command<{ services: string[] }>(

@@ -7,15 +7,20 @@ import { printError } from '../utils/errors';
 import { stopProcess } from './stop';
 import { startService } from './start';
 
-export const restartServices = async (serviceWhitelist: string[]) => {
+export const restartServices = async (
+  serviceWhitelist: string[],
+  removeDockerContainers = false,
+) => {
   if (docker.isPresent()) {
     if (serviceWhitelist.length === 0) {
-      await docker.stop();
+      if (removeDockerContainers) await docker.rm();
+      else docker.stop()
       await docker.up();
     } else {
       const dockerServices = await docker.composeServiceNames(serviceWhitelist);
       if (dockerServices.length > 0) {
-        await docker.stop(dockerServices);
+        if (removeDockerContainers) await docker.rm(dockerServices);
+        else await docker.stop(dockerServices);
         await docker.up(dockerServices);
       }
     }
