@@ -21,6 +21,11 @@ const pull = (cwd: string) => exec('git pull', { cwd, live: true });
 export const clone = (cwd: string, repo: string, dest = '') =>
   exec(`git clone ${repo} ${dest}`, { cwd, live: true });
 
+export const checkout = (cwd: string, branch: string) =>
+  exec(`git checkout ${branch}`, { cwd, live: true });
+
+export const status = (cwd: string) => exec(`git status`, { cwd, live: true });
+
 export const safePull = async (cwd: string) => {
   const branch = await activeBranch(cwd);
   if (await branchExistsOnRemote(cwd, branch)) await pull(cwd);

@@ -1,3 +1,5 @@
+import { last } from 'lodash';
+
 import * as git from '../utils/git';
 import { readServices } from '../utils/config';
 import { fileExists, CWD } from '../utils/files';
@@ -14,11 +16,10 @@ export const syncService = async (name: string, repo: string) => {
     log`Cloning {bold ${name}}`;
     await git.clone(CWD, repo, name);
   }
-  console.log();
 };
 
-export const syncServices = async () => {
-  const services = await readServices();
+export const syncServices = async (serviceWhitelist?: string[]) => {
+  const services = await readServices(serviceWhitelist);
 
   for (const { name, repo } of services) {
     if (!repo) continue;
@@ -27,5 +28,6 @@ export const syncServices = async () => {
     } catch (e) {
       printError(e);
     }
+    if (name !== last(services)?.name) console.log();
   }
 };
