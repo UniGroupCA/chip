@@ -59,7 +59,7 @@ export const composeServices = async (): Promise<{
   [serviceName: string]: { image: string };
 }> => {
   const composeYml = await fs.readFile(`${CWD}/docker-compose.yml`, 'utf8');
-  const composeConfig = await yaml.safeLoad(composeYml);
+  const composeConfig = (await yaml.safeLoad(composeYml)) as any;
   return composeConfig?.services ?? {};
 };
 
