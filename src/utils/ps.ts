@@ -5,8 +5,10 @@ import {
   CHIP_PROCESSES_FILE,
   writeJsonFile,
   CHIP_LOGS_DIR,
+  CWD,
 } from './files';
 import { readProcesses, ProcessRecord } from './config';
+import { printError } from './errors';
 
 export const initChip = async () => {
   if (!(await fs.exists(CHIP_DIR))) await fs.mkdir(CHIP_DIR);
@@ -14,6 +16,11 @@ export const initChip = async () => {
 
   if (!(await fs.exists(CHIP_PROCESSES_FILE))) {
     writeJsonFile(CHIP_PROCESSES_FILE, {});
+  }
+
+  if (!(await fs.exists('./chip.yml'))) {
+    printError({ message: `No chip.yml file found in ${CWD}` });
+    process.exit(1);
   }
 };
 
