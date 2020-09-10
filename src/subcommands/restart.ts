@@ -1,3 +1,4 @@
+import * as docker from '../utils/docker';
 import { readServices } from '../utils/config';
 import { PROJECT_NAME } from '../utils/files';
 import { log } from '../utils/log';
@@ -6,7 +7,25 @@ import { printError } from '../utils/errors';
 import { stopProcess } from './stop';
 import { startService } from './start';
 
-export const restartServices = async (serviceWhitelist?: string[]) => {
+export const restartServices = async (
+  serviceWhitelist: string[],
+  removeDockerContainers = false,
+) => {
+  if (docker.isPresent()) {
+    if (serviceWhitelist.length === 0) {
+      if (removeDockerContainers) await docker.rm();
+      else docker.stop()
+      await docker.up();
+    } else {
+      const dockerServices = await docker.composeServiceNames(serviceWhitelist);
+      if (dockerServices.length > 0) {
+        if (removeDockerContainers) await docker.rm(dockerServices);
+        else await docker.stop(dockerServices);
+        await docker.up(dockerServices);
+      }
+    }
+  }
+
   const services = await readServices(serviceWhitelist);
   const activeProcesses = await getActiveProcesses(PROJECT_NAME);
 

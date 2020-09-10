@@ -1,5 +1,6 @@
 import { bold, green, red } from 'chalk';
 import { table } from 'table';
+import humanize from 'humanize-duration';
 
 import * as git from '../utils/git';
 import * as docker from '../utils/docker';
@@ -35,14 +36,34 @@ export const listServices = async () => {
   ];
 
   for (const { name, run = '' } of services) {
-    const pid = (activeProcesses[name] || {}).pid;
+    const { pid, startTime } = activeProcesses[name] || {};
     const exists = !!pid;
+
+    let status = '';
+    if (run) {
+      if (exists) {
+        if (startTime) {
+          const uptime = Date.now() - startTime!;
+          const prettyUptime = humanize(uptime, {
+            largest: 1,
+            maxDecimalPoints: 0,
+          });
+          status = green(`Up ${prettyUptime}`);
+        } else {
+          // Handle cases where `startTime === undefined` for backwards
+          // compatibility
+          status = green(`Up`);
+        }
+      } else {
+        status = red('Stopped');
+      }
+    }
 
     // prettier-ignore
     tableData.push([
       name,
       run.substring(0, 20) + (run.length > 20 ? '...' : ''),
-      !run ? '' : (exists ? green('Running') : red('Stopped')),
+      status,
       exists ? String(pid) : '',
       await git.activeBranch(name),
     ]);
