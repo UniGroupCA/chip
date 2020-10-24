@@ -14,7 +14,7 @@ export const restartServices = async (
   if (docker.isPresent()) {
     if (serviceWhitelist.length === 0) {
       if (removeDockerContainers) await docker.rm();
-      else docker.stop()
+      else await docker.stop();
       await docker.up();
     } else {
       const dockerServices = await docker.composeServiceNames(serviceWhitelist);

@@ -1,3 +1,5 @@
+import { last } from 'lodash';
+
 import { readServices, readScripts } from '../utils/config';
 import { exec } from '../utils/processes';
 import { log } from '../utils/log';
@@ -43,5 +45,6 @@ export const installServices = async (serviceWhitelist?: string[]) => {
     } catch (e) {
       printError(e);
     }
+    if (name !== last(services)?.name) console.log();
   }
 };

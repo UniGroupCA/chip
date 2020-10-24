@@ -26,15 +26,15 @@ export interface ChipSecrets {
 
 export const readConfig = async (): Promise<ChipConfig> => {
   const chipYml = await fs.readFile('./chip.yml', 'utf8');
-  const chipConfig = (await yaml.safeLoad(chipYml) as any)
-  return chipConfig
+  const chipConfig = (await yaml.safeLoad(chipYml)) as any;
+  return chipConfig;
 };
 
 export const readSecrets = async (): Promise<ChipSecrets> => {
   try {
     const secretYml = await fs.readFile('./secretchip.yml', 'utf8');
-    const secretConfig = (await yaml.safeLoad(secretYml) as any)
-    return secretConfig 
+    const secretConfig = (await yaml.safeLoad(secretYml)) as any;
+    return secretConfig;
   } catch (e) {
     if (e.code === 'ENOENT') return {};
     else throw e;
@@ -52,14 +52,16 @@ export const readScripts = async () => {
 
 export const readServices = async (
   whitelist: string[] = [],
-): Promise<{
-  name: string;
-  repo?: string;
-  install?: string;
-  run?: string;
-  env: { [envVar: string]: string };
-  secrets: { [name: string]: string };
-}[]> => {
+): Promise<
+  {
+    name: string;
+    repo?: string;
+    install?: string;
+    run?: string;
+    env: { [envVar: string]: string };
+    secrets: { [name: string]: string };
+  }[]
+> => {
   const config = await readConfig();
   const secrets = await readSecrets();
 
