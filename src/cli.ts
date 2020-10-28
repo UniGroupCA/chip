@@ -1,6 +1,6 @@
 import yargs from 'yargs';
 
-import { initChip } from './utils/ps';
+import { initChip, assertSubdirs } from './utils/init';
 import { handleErrors } from './utils/errors';
 
 import { syncServices } from './subcommands/sync';
@@ -12,6 +12,7 @@ import { listServices } from './subcommands/list';
 import { logServices } from './subcommands/logs';
 import { checkoutServices } from './subcommands/checkout';
 import { statusServices } from './subcommands/status';
+import { cleanNames } from './utils/strings';
 
 yargs
   .command<{ services: string[] }>(
@@ -20,7 +21,7 @@ yargs
     (yargs) => yargs.positional('services', { describe: 'service names' }),
     handleErrors(async ({ services }) => {
       await initChip();
-      await syncServices(services);
+      await syncServices(cleanNames(services));
     }),
   )
   .command<{ branch: string; services: string[] }>(
@@ -32,7 +33,8 @@ yargs
         .positional('services', { describe: 'service names' }),
     handleErrors(async ({ branch, services }) => {
       await initChip();
-      await checkoutServices(branch, services);
+      await assertSubdirs();
+      await checkoutServices(branch, cleanNames(services));
     }),
   )
   .command<{ services: string[] }>(
@@ -41,7 +43,8 @@ yargs
     (yargs) => yargs.positional('services', { describe: 'service names' }),
     handleErrors(async ({ services }) => {
       await initChip();
-      await statusServices(services);
+      await assertSubdirs();
+      await statusServices(cleanNames(services));
     }),
   )
   .command<{ services: string[] }>(
@@ -50,7 +53,8 @@ yargs
     (yargs) => yargs.positional('services', { describe: 'service names' }),
     handleErrors(async ({ services }) => {
       await initChip();
-      await installServices(services);
+      await assertSubdirs();
+      await installServices(cleanNames(services));
     }),
   )
   .command<{ services: string[] }>(
@@ -59,7 +63,8 @@ yargs
     (yargs) => yargs.positional('services', { describe: 'service names' }),
     handleErrors(async ({ services }) => {
       await initChip();
-      await startServices(services);
+      await assertSubdirs();
+      await startServices(cleanNames(services));
     }),
   )
   .command<{ services: string[]; remove: boolean }>(
@@ -74,21 +79,24 @@ yargs
       }),
     handleErrors(async ({ services, remove = false }) => {
       await initChip();
-      await stopServices(services, remove);
+      await assertSubdirs();
+      await stopServices(cleanNames(services), remove);
     }),
   )
   .command<{ services: string[]; remove: boolean }>(
     'restart [services..]',
     'Stop and restart services in project',
-    (yargs) => yargs.positional('services', { describe: 'service names' }).option('r', {
-      alias: ['remove', 'rm'],
-      type: 'boolean',
-      describe:
-        'Remove containers after stopping them. Only applies to docker-compose services. If you have a database service and want to clear/reset it, you could use this option.',
-    }),
+    (yargs) =>
+      yargs.positional('services', { describe: 'service names' }).option('r', {
+        alias: ['remove', 'rm'],
+        type: 'boolean',
+        describe:
+          'Remove containers after stopping them. Only applies to docker-compose services. If you have a database service and want to clear/reset it, you could use this option.',
+      }),
     handleErrors(async ({ services, remove = false }) => {
       await initChip();
-      await restartServices(services, remove);
+      await assertSubdirs();
+      await restartServices(cleanNames(services), remove);
     }),
   )
   .command<{ services: string[] }>(
@@ -97,7 +105,8 @@ yargs
     (yargs) => yargs.positional('services', { describe: 'service names' }),
     handleErrors(async ({ services }) => {
       await initChip();
-      await logServices(services);
+      await assertSubdirs();
+      await logServices(cleanNames(services));
     }),
   )
   .command(
@@ -106,6 +115,7 @@ yargs
     {},
     handleErrors(async () => {
       await initChip();
+      await assertSubdirs();
       await listServices();
     }),
   )

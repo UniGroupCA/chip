@@ -1,28 +1,7 @@
 import fs from 'mz/fs';
 import { exec } from './processes';
-import {
-  CHIP_DIR,
-  CHIP_PROCESSES_FILE,
-  writeJsonFile,
-  CHIP_LOGS_DIR,
-  CWD,
-} from './files';
+import { CHIP_PROCESSES_FILE, writeJsonFile, CHIP_LOGS_DIR } from './files';
 import { readProcesses, ProcessRecord } from './config';
-import { printError } from './errors';
-
-export const initChip = async () => {
-  if (!(await fs.exists(CHIP_DIR))) await fs.mkdir(CHIP_DIR);
-  if (!(await fs.exists(CHIP_LOGS_DIR))) await fs.mkdir(CHIP_LOGS_DIR);
-
-  if (!(await fs.exists(CHIP_PROCESSES_FILE))) {
-    writeJsonFile(CHIP_PROCESSES_FILE, {});
-  }
-
-  if (!(await fs.exists('./chip.yml'))) {
-    printError({ message: `No chip.yml file found in ${CWD}` });
-    process.exit(1);
-  }
-};
 
 export const processExists = async (pid: number) => {
   try {

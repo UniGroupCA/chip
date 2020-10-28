@@ -2,6 +2,7 @@ import { exec } from './processes';
 
 export const activeBranch = async (cwd: string) => {
   const output = await exec('git branch', { cwd });
+  if (output.trim() === '') return '';
   const targetLine = output.split('\n').find((line) => line.includes('*'));
   if (!targetLine) throw new Error('Failed to parse `git branch` output');
   return targetLine.substring(2);
