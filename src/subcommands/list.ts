@@ -17,6 +17,7 @@ const dockerServices = async () => {
     status ?? '',
     ' 🐳',
     '',
+    '',
   ]);
 };
 
@@ -32,10 +33,11 @@ export const listServices = async () => {
       bold('STATUS'),
       bold('PID'),
       bold('BRANCH'),
+      bold('TAGS'),
     ],
   ];
 
-  for (const { name, run = '' } of services) {
+  for (const { name, run = '', tags = [] } of services) {
     const { pid, startTime } = activeProcesses[name] || {};
     const exists = !!pid;
 
@@ -59,6 +61,8 @@ export const listServices = async () => {
       }
     }
 
+    const allTags = tags.join(', ') || '';
+
     // prettier-ignore
     tableData.push([
       name,
@@ -66,6 +70,7 @@ export const listServices = async () => {
       status,
       exists ? String(pid) : '',
       await git.activeBranch(name),
+      allTags.substring(0, 30) + (allTags.length > 30 ? '...' : ''),
     ]);
   }
 
@@ -82,6 +87,7 @@ export const listServices = async () => {
         2: { alignment: 'left' },
         3: { alignment: 'left' },
         4: { alignment: 'left' },
+        5: { alignment: 'left' },
       },
     }).trim(),
   );

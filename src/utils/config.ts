@@ -13,7 +13,8 @@ export interface ChipConfig {
           install?: string;
           run?: string;
           env?: { [envVar: string]: string };
-        }
+          tags?: string[];
+    }
       | undefined;
   };
 }
@@ -60,6 +61,7 @@ export const readServices = async (
     run?: string;
     env: { [envVar: string]: string };
     secrets: { [name: string]: string };
+    tags?: string[];
   }[]
 > => {
   const config = await readConfig();
@@ -75,7 +77,10 @@ export const readServices = async (
   );
 
   return whitelist.length > 0
-    ? allServices.filter((service) => whitelist.includes(service.name))
+    ? [...new Set([
+        ...allServices.filter(service => whitelist.includes(service.name)),
+        ...allServices.filter(service => service.tags?.some(tag => whitelist.includes(tag))),
+      ])]
     : allServices;
 };
 
