@@ -33,18 +33,18 @@ All subcommands supported by `chip` can be viewed by running `chip help`:
 chip <command>
 
 Commands:
-  chip sync [services..]               Clone or pull repos for services in
-                                       project
-  chip checkout <branch> [services..]  Checkout a git branch for services in
-                                       project
-  chip status [services..]             Show git status for services in project
-  chip install [services..]            Install dependencies for services in
-                                       project
-  chip start [services..]              Start services in project
-  chip stop [services..]               Stop services in project
-  chip restart [services..]            Stop and restart services in project
-  chip logs [services..]               View logs for services in project
-  chip list                            List all services in project
+  chip sync [services|tags..]               Clone or pull repos for services in
+                                            project
+  chip checkout <branch> [services|tags..]  Checkout a git branch for services in
+                                            project
+  chip status [services|tags..]             Show git status for services in project
+  chip install [services|tags..]            Install dependencies for services in
+                                            project
+  chip start [services|tags..]              Start services in project
+  chip stop [services|tags..]               Stop services in project
+  chip restart [services|tags..]            Stop and restart services in project
+  chip logs [services|tags..]               View logs for services in project
+  chip list                                 List all services in project
 ```
 
 ## Sample Project
@@ -83,11 +83,15 @@ services:
     repo: 'git@github.com:QDivision/sandwich-ui.git'
     install: 'yarn install'
     run: 'yarn start'
+    tags:
+      - sandwich
 
   sandwich-api:
     repo: 'git@github.com:QDivision/sandwich-api.git'
     install: 'mvn clean package -D maven.test.skip=true'
     run: 'mvn spring-boot:run -D spring-boot.run.profiles=local'
+    tags:
+      - sandwich
 
   ingredient-api:
     repo: 'git@github.com:QDivision/ingredient-api.git'
