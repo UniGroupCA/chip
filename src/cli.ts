@@ -16,7 +16,7 @@ import { cleanNames } from './utils/strings';
 
 yargs
   .command<{ services: string[] }>(
-    'sync [services..]',
+    'sync [services|tags..]',
     'Clone or pull repos for services in project',
     (yargs) => yargs.positional('services', { describe: 'service names' }),
     handleErrors(async ({ services }) => {
@@ -25,7 +25,7 @@ yargs
     }),
   )
   .command<{ branch: string; services: string[] }>(
-    'checkout <branch> [services..]',
+    'checkout <branch> [services|tags..]',
     'Checkout a git branch for services in project',
     (yargs) =>
       yargs
@@ -38,7 +38,7 @@ yargs
     }),
   )
   .command<{ services: string[] }>(
-    'status [services..]',
+    'status [services|tags..]',
     'Show git status for services in project',
     (yargs) => yargs.positional('services', { describe: 'service names' }),
     handleErrors(async ({ services }) => {
@@ -48,7 +48,7 @@ yargs
     }),
   )
   .command<{ services: string[] }>(
-    'install [services..]',
+    'install [services|tags..]',
     'Install dependencies for services in project',
     (yargs) => yargs.positional('services', { describe: 'service names' }),
     handleErrors(async ({ services }) => {
@@ -58,7 +58,7 @@ yargs
     }),
   )
   .command<{ services: string[] }>(
-    'start [services..]',
+    'start [services|tags..]',
     'Start services in project',
     (yargs) => yargs.positional('services', { describe: 'service names' }),
     handleErrors(async ({ services }) => {
@@ -68,7 +68,7 @@ yargs
     }),
   )
   .command<{ services: string[]; remove: boolean }>(
-    'stop [services..]',
+    'stop [services|tags..]',
     'Stop services in project',
     (yargs) =>
       yargs.positional('services', { describe: 'service names' }).option('r', {
@@ -84,7 +84,7 @@ yargs
     }),
   )
   .command<{ services: string[]; remove: boolean }>(
-    'restart [services..]',
+    'restart [services|tags..]',
     'Stop and restart services in project',
     (yargs) =>
       yargs.positional('services', { describe: 'service names' }).option('r', {
@@ -100,7 +100,7 @@ yargs
     }),
   )
   .command<{ services: string[] }>(
-    'logs [services..]',
+    'logs [services|tags..]',
     'View logs for services in project',
     (yargs) => yargs.positional('services', { describe: 'service names' }),
     handleErrors(async ({ services }) => {
