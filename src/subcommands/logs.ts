@@ -15,15 +15,17 @@ export const logService = async (
   color: chalk.Chalk,
   offset: number,
 ) => {
-  const fileName = `${CHIP_LOGS_DIR}/${projectName}/${serviceName}.log`;
+  const fileName = `${CHIP_LOGS_DIR}/${projectName}/${serviceName}.log.timestamps`;
   const subprocess = spawn('tail', ['-f', '-c', `+${offset}`, fileName]);
   [subprocess.stdout, subprocess.stderr].forEach((stream) => {
     const rl = readline.createInterface({ input: stream });
 
     rl.on('line', (line) => {
+      const firstSpace = line.indexOf(' ');
+      const log = line.substring(firstSpace + 1);
       const paddedName = serviceName.padEnd(padLength);
       const prefix = color(chalk.bold(`${paddedName} | `));
-      console.log(prefix + line);
+      console.log(prefix + log);
     });
 
     stream.on('exit', (data) => {

@@ -5,6 +5,7 @@ import { exec } from '../utils/processes';
 import { processExists, getActiveProcesses } from '../utils/ps';
 import { PROJECT_NAME } from '../utils/files';
 import { printError } from '../utils/errors';
+import {readServices} from "../utils/config";
 
 export const stopProcess = async (name: string, pid: number) => {
   console.log(chalk`Stopping {bold ${name}} with pid {bold ${pid}}`);
@@ -23,16 +24,13 @@ export const stopServices = async (
   serviceWhitelist: string[],
   removeDockerContainers = false,
 ) => {
-  const processes = await getActiveProcesses(PROJECT_NAME);
+  const services = await readServices(serviceWhitelist);
+  const activeProcesses = await getActiveProcesses(PROJECT_NAME);
 
-  const filteredProcesses = Object.entries(processes).filter(
-    ([name]) =>
-      serviceWhitelist.length === 0 || serviceWhitelist.includes(name),
-  );
-
-  for (const [name, { pid }] of filteredProcesses) {
+  for (const { name, run } of services) {
+    if (!run || !activeProcesses[name]) continue;
     try {
-      await stopProcess(name, pid);
+      await stopProcess(name, activeProcesses[name].pid);
     } catch (e) {
       printError(e);
     }
