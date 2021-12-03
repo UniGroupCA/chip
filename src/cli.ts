@@ -12,6 +12,7 @@ import { listServices } from './subcommands/list';
 import { logServices } from './subcommands/logs';
 import { checkoutServices } from './subcommands/checkout';
 import { statusServices } from './subcommands/status';
+import { cleanServices } from './subcommands/clean';
 import { cleanNames } from './utils/strings';
 
 yargs
@@ -117,6 +118,16 @@ yargs
       await initChip();
       await assertSubdirs();
       await listServices();
+    }),
+  )
+  .command<{ services: string[] }>(
+    'clean [services|tags..]',
+    'Clear log files for services in project',
+    (yargs) => yargs.positional('services', { describe: 'service names' }),
+    handleErrors(async ({ services }) => {
+      await initChip();
+      await assertSubdirs();
+      await cleanServices(cleanNames(services));
     }),
   )
   .help()

@@ -1,6 +1,6 @@
 {
   "name": "@qdivision/chip",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Easily manage microservices and infrastructure for local development",
   "files": [
     "build/",
