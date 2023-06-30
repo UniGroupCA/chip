@@ -14,7 +14,7 @@ export interface ChipConfig {
           run?: string;
           env?: { [envVar: string]: string };
           tags?: string[];
-    }
+        }
       | undefined;
   };
 }
@@ -77,10 +77,14 @@ export const readServices = async (
   );
 
   return whitelist.length > 0
-    ? [...new Set([
-        ...allServices.filter(service => whitelist.includes(service.name)),
-        ...allServices.filter(service => service.tags?.some(tag => whitelist.includes(tag))),
-      ])]
+    ? [
+        ...new Set([
+          ...allServices.filter((service) => whitelist.includes(service.name)),
+          ...allServices.filter((service) =>
+            service.tags?.some((tag) => whitelist.includes(tag)),
+          ),
+        ]),
+      ]
     : allServices;
 };
 
@@ -94,6 +98,9 @@ export interface ProcessRecord {
 
   /** When the process was started (as a unix timestamp in milliseconds) */
   startTime?: number;
+
+  /** Listening TCP ports **/
+  ports?: string[];
 }
 
 export interface Processes {

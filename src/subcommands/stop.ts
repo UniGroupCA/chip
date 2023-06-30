@@ -5,7 +5,7 @@ import { exec } from '../utils/processes';
 import { processExists, getActiveProcesses } from '../utils/ps';
 import { PROJECT_NAME } from '../utils/files';
 import { printError } from '../utils/errors';
-import {readServices} from "../utils/config";
+import { readServices } from '../utils/config';
 
 export const stopProcess = async (name: string, pid: number) => {
   console.log(chalk`Stopping {bold ${name}} with pid {bold ${pid}}`);

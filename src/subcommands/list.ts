@@ -11,11 +11,12 @@ import { PROJECT_NAME } from '../utils/files';
 const dockerServices = async () => {
   if (!docker.isPresent()) return [];
   const services = await docker.listServices();
-  return services.map(({ name, image, status }) => [
+  return services.map(({ name, image, status, ports }) => [
     name,
     image ?? '',
     status ?? '',
     ' 🐳',
+    ports ?? '',
     '',
     '',
   ]);
@@ -32,13 +33,14 @@ export const listServices = async () => {
       bold('COMMAND/IMAGE'),
       bold('STATUS'),
       bold('PID'),
+      bold('PORTS'),
       bold('BRANCH'),
       bold('TAGS'),
     ],
   ];
 
   for (const { name, run = '', tags = [] } of services) {
-    const { pid, startTime } = activeProcesses[name] || {};
+    const { pid, startTime, ports } = activeProcesses[name] || {};
     const exists = !!pid;
 
     let status = '';
@@ -69,6 +71,7 @@ export const listServices = async () => {
       run.substring(0, 20) + (run.length > 20 ? '...' : ''),
       status,
       exists ? String(pid) : '',
+      ports?.join(', ') || '',
       await git.activeBranch(name),
       allTags.substring(0, 30) + (allTags.length > 30 ? '...' : ''),
     ]);
@@ -88,6 +91,7 @@ export const listServices = async () => {
         3: { alignment: 'left' },
         4: { alignment: 'left' },
         5: { alignment: 'left' },
+        6: { alignment: 'left' },
       },
     }).trim(),
   );

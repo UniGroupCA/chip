@@ -52,16 +52,20 @@ export const getActiveProcesses = async (projectName: string) => {
   const processes = (await getAllProcesses(projectName)) || {};
   for (const [name, config] of Object.entries(processes)) {
     const { pid, startTime } = config!;
-    if (await processExists(pid)) {
-      if (startTime) {
-        const currentStartTime = await lookupStartTime(pid);
-        if (currentStartTime === startTime) activeProcesses[name] = config!;
-      } else {
-        // Handle missing `startTime` for backwards compatibility
-        activeProcesses[name] = config!;
-      }
+    if (
+      (await processExists(pid)) &&
+      ((startTime && (await lookupStartTime(pid)) === startTime) || !startTime)
+    ) {
+      activeProcesses[name] = config!;
     }
   }
+
+  await Promise.all(
+    Object.keys(activeProcesses).map(
+      async (name) => (activeProcesses[name].ports = await getPorts(name)),
+    ),
+  );
+
   return activeProcesses;
 };
 
@@ -72,4 +76,12 @@ export const createLogStream = async (
   const dir = `${CHIP_LOGS_DIR}/${projectName}`;
   if (!(await fs.exists(dir))) await fs.mkdir(dir);
   return fs.open(`${dir}/${serviceName}.log`, 'w');
+};
+
+export const getPorts = async (serviceName: string) => {
+  const ports = await exec(
+    `lsof -nP -p $(pgrep -f ${serviceName} | tr '\n' ,) | grep LISTEN | awk '{split($9, a, ":"); print a[length(a)]}'`,
+    { cwd: '.', live: false },
+  );
+  return ports.trim().split('\n');
 };
