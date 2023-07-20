@@ -75,14 +75,15 @@ export const listServices = async () => {
   const services = await composeServices();
 
   const allRunningServicesTable = await run(
-    `docker ps --format '{{.Label "com.docker.compose.project.working_dir"}}   {{.Label "com.docker.compose.service"}}   {{.Status}}'`,
+    `docker ps --format '{{.Label "com.docker.compose.project.working_dir"}}   {{.Label "com.docker.compose.service"}}   {{.Status}}   {{.Ports}}'`,
   );
 
   const runningServices = parseTable(allRunningServicesTable)
-    .map(([projectDir, serviceName, status]) => ({
+    .map(([projectDir, serviceName, status, ports]) => ({
       projectDir,
       serviceName,
       status,
+      ports,
     }))
     .filter(({ projectDir }) => resolve(projectDir) === CWD);
 
@@ -92,6 +93,13 @@ export const listServices = async () => {
       name: serviceName,
       image,
       status: info?.status ? green(capitalize(info.status)) : red('Stopped'),
+      ports: info?.ports
+        ? info.ports
+            .split(', ')
+            .filter((p) => p.includes('0.0.0.0'))
+            .map((p) => p.match(/\b\d+(?=\/tcp\b)/)?.[0])
+            .join(', ')
+        : '',
     };
   });
 };
