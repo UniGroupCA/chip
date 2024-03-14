@@ -14,7 +14,7 @@ export const fileExists = async (path: string) => {
   try {
     await fs.stat(path);
     return true;
-  } catch (e: NodeJS.ErrnoException) {
+  } catch (e: any) {
     if (e.code === 'ENOENT') return false;
     throw e;
   }
